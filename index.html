@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#17100f" />
+    <meta name="description" content="Skylar XD WhatsApp pairing portal." />
+    <title>𝑺𝑲𝒀𝑳𝑨𝑹 𝑿𝑫 · Pairing Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600;1,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-left" aria-hidden="true"></div>
+    <div class="ambient ambient-right" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="Skylar XD home">
+          <span class="brand-mark">S</span>
+          <span class="brand-copy">
+            <strong>𝑺𝑲𝒀𝑳𝑨𝑹 𝑿𝑫</strong>
+            <small>WHATSAPP AUTOMATION</small>
+          </span>
+        </a>
+        <span class="online-pill"><i></i> Gateway online</span>
+      </header>
+
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">A quiet, faster way to connect</p>
+          <h1 id="page-title">Pair your number<br /><em>with Skylar XD.</em></h1>
+          <p class="hero-text">Connect your WhatsApp account to a lightweight command suite built for media, groups, utilities, and everyday automation.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#pair">Start pairing <span>↗</span></a>
+            <a class="button ghost" href="#how-it-works">How it works</a>
+          </div>
+          <div class="micro-proof"><span>●</span> Secure pairing request · No password required</div>
+        </div>
+        <div class="hero-orbit" aria-hidden="true">
+          <div class="orbit-ring ring-one"></div>
+          <div class="orbit-ring ring-two"></div>
+          <div class="orbit-core"><span>SK</span><small>XD</small></div>
+        </div>
+      </section>
+
+      <section class="stat-row" aria-label="Skylar XD status">
+        <article class="stat-card"><strong><i class="live-dot"></i>LIVE</strong><span>pairing gateway</span></article>
+        <article class="stat-card"><strong>24/7</strong><span>runtime target</span></article>
+        <article class="stat-card"><strong>GLOBAL</strong><span>access ready</span></article>
+      </section>
+
+      <section class="pair-card" id="pair" aria-labelledby="pair-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">One step to connect</p>
+            <h2 id="pair-title">Generate a pairing code</h2>
+          </div>
+          <span class="step-badge">01 / 02</span>
+        </div>
+        <p class="section-text">Enter your WhatsApp number with the country code. Use numbers only, without <code>+</code> or spaces.</p>
+        <form id="pair-form" novalidate>
+          <label for="phone">WhatsApp number</label>
+          <div class="phone-field">
+            <span class="field-prefix">+</span>
+            <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="254 712 345 678" aria-describedby="phone-help" required />
+          </div>
+          <p class="field-help" id="phone-help">Example: <strong>254712345678</strong> for a Kenyan number.</p>
+          <button class="button primary submit-button" id="submit-button" type="submit"><span>Generate pairing code</span><span class="button-arrow">→</span></button>
+        </form>
+        <div class="status-box" id="status-box" role="status" aria-live="polite" hidden></div>
+        <div class="code-box" id="code-box" hidden>
+          <span class="code-label">Your WhatsApp pairing code</span>
+          <strong id="code-value">--------</strong>
+          <p>Open WhatsApp → Linked devices → Link a device → Link with phone number.</p>
+          <button class="copy-button" id="copy-code" type="button">Copy code</button>
+        </div>
+        <div class="fallback-box" id="fallback-box" hidden>
+          <strong>Pairing gateway needs attention.</strong>
+          <p>The portal could not reach the live pairing service. You can continue through the Telegram gateway while the connection is restored.</p>
+          <a class="button telegram" href="https://t.me/blacklordProjects_bot?start=skylar" target="_blank" rel="noopener noreferrer">Continue in Telegram <span>↗</span></a>
+        </div>
+      </section>
+
+      <section class="how-section" id="how-it-works" aria-labelledby="how-title">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow">Simple by design</p>
+            <h2 id="how-title">How pairing works</h2>
+          </div>
+          <span class="section-note">Takes about a minute</span>
+        </div>
+        <div class="steps">
+          <article class="step"><span>01</span><div><strong>Enter your number</strong><p>Use the full international format without the plus sign.</p></div></article>
+          <article class="step"><span>02</span><div><strong>Receive the code</strong><p>Copy the short code returned by the Skylar gateway.</p></div></article>
+          <article class="step"><span>03</span><div><strong>Link in WhatsApp</strong><p>Confirm the code under Linked devices and start using Skylar XD.</p></div></article>
+        </div>
+      </section>
+
+      <section class="feature-section" aria-labelledby="feature-title">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow">Inside your session</p>
+            <h2 id="feature-title">Built for everyday use</h2>
+          </div>
+        </div>
+        <div class="feature-grid">
+          <article><span class="feature-icon">⌁</span><strong>Media tools</strong><p>Stickers, status tools, downloads, and converters.</p></article>
+          <article><span class="feature-icon">⌘</span><strong>Group control</strong><p>Useful moderation and community management commands.</p></article>
+          <article><span class="feature-icon">✦</span><strong>Smart utilities</strong><p>Search, translate, QR, AI, and daily helper commands.</p></article>
+        </div>
+      </section>
+
+      <footer class="footer"><span>𝑺𝑲𝒀𝑳𝑨𝑹 𝑿𝑫</span><span>Pair responsibly · Built for the Skylar community</span><a href="https://github.com/blacklorddev15/skylar" target="_blank" rel="noopener noreferrer">Source ↗</a></footer>
+    </main>
+    <script src="./script.js" defer></script>
+  </body>
+</html>
