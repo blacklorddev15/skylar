@@ -101,6 +101,22 @@
         </article>
       </section>
 
+      <section class="admin-card" aria-labelledby="mode-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Gateway Policy</p>
+            <h2 id="mode-heading">Licensing Mode Switcher</h2>
+          </div>
+          <span class="step-badge" id="current-mode-badge">FREE MODE</span>
+        </div>
+        <p class="section-text">Switch between Free Mode (no activation key required for public pairing) and Premium Mode (requires a valid activation key).</p>
+        
+        <div class="mode-toggle-group" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 20px 0 0;">
+          <button class="button mode-btn active" id="admin-free-btn" type="button" style="justify-content: center; background: rgba(243, 180, 134, 0.15); border-color: var(--accent-strong);">Free Mode (No Key)</button>
+          <button class="button mode-btn ghost" id="admin-prem-btn" type="button" style="justify-content: center;">Premium Mode (Key Required)</button>
+        </div>
+      </section>
+
       <section class="admin-card" aria-labelledby="key-gen-heading">
         <div class="section-heading">
           <div>
@@ -167,6 +183,41 @@
           adminPass.value = '';
         }
       });
+
+      const adminFreeBtn = document.querySelector('#admin-free-btn');
+      const adminPremBtn = document.querySelector('#admin-prem-btn');
+      const currentModeBadge = document.querySelector('#current-mode-badge');
+
+      let adminMode = localStorage.getItem('skylar_mode') || 'free';
+
+      function updateAdminModeUI(mode) {
+        adminMode = mode;
+        localStorage.setItem('skylar_mode', mode);
+        if (mode === 'premium') {
+          currentModeBadge.textContent = 'PREMIUM MODE';
+          currentModeBadge.style.color = '#ffcca7';
+          adminPremBtn.style.background = 'rgba(243, 180, 134, 0.15)';
+          adminPremBtn.style.borderColor = 'var(--accent-strong)';
+          adminPremBtn.className = 'button mode-btn active';
+          adminFreeBtn.style.background = 'transparent';
+          adminFreeBtn.style.borderColor = 'transparent';
+          adminFreeBtn.className = 'button mode-btn ghost';
+        } else {
+          currentModeBadge.textContent = 'FREE MODE';
+          currentModeBadge.style.color = '';
+          adminFreeBtn.style.background = 'rgba(243, 180, 134, 0.15)';
+          adminFreeBtn.style.borderColor = 'var(--accent-strong)';
+          adminFreeBtn.className = 'button mode-btn active';
+          adminPremBtn.style.background = 'transparent';
+          adminPremBtn.style.borderColor = 'transparent';
+          adminPremBtn.className = 'button mode-btn ghost';
+        }
+      }
+
+      updateAdminModeUI(adminMode);
+
+      adminFreeBtn.addEventListener('click', () => updateAdminModeUI('free'));
+      adminPremBtn.addEventListener('click', () => updateAdminModeUI('premium'));
 
       const generateBtn = document.querySelector('#generate-admin-key');
       const keyBox = document.querySelector('#admin-key-box');

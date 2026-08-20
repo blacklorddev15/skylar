@@ -69,7 +69,14 @@
             <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="254 712 345 678" aria-describedby="phone-help" required />
           </div>
           <p class="field-help" id="phone-help">Example: <strong>254712345678</strong> for a Kenyan number.</p>
-          <button class="button primary submit-button" id="submit-button" type="submit"><span>Generate pairing code</span><span class="button-arrow">→</span></button>
+
+          <div id="activation-key-group" style="margin-top: 18px;" hidden>
+            <label for="activation-key" style="display: block; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-strong); margin-bottom: 8px;">Activation Key (Required in Premium Mode)</label>
+            <input id="activation-key" name="activationKey" type="text" placeholder="SKXD-PREM-2026-XXXX" style="width: 100%; padding: 13px 16px; border: 1px solid rgba(243, 180, 134, 0.4); border-radius: 9px; background: rgba(20, 10, 8, 0.85); color: var(--ink); font-family: monospace; outline: none;" />
+            <p class="field-help" style="margin-top: 6px;">Contact the administrator to obtain a valid premium activation key.</p>
+          </div>
+
+          <button class="button primary submit-button" id="submit-button" type="submit" style="margin-top: 18px;"><span>Generate pairing code</span><span class="button-arrow">→</span></button>
         </form>
         <div class="status-box" id="status-box" role="status" aria-live="polite" hidden></div>
         <div class="code-box" id="code-box" hidden>

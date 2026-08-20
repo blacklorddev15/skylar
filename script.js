@@ -74,6 +74,26 @@ async function pollPairing(requestId) {
   }
 }
 
+const activationKeyInput = document.querySelector('#activation-key');
+const activationKeyGroup = document.querySelector('#activation-key-group');
+
+// Check localStorage for admin licensing mode
+let isPremium = localStorage.getItem('skylar_mode') === 'premium';
+
+function syncPublicMode() {
+  if (isPremium) {
+    activationKeyGroup.hidden = false;
+  } else {
+    activationKeyGroup.hidden = true;
+  }
+}
+
+syncPublicMode();
+window.addEventListener('storage', () => {
+  isPremium = localStorage.getItem('skylar_mode') === 'premium';
+  syncPublicMode();
+});
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   clearInterval(pollTimer);
@@ -85,13 +105,19 @@ form.addEventListener('submit', async (event) => {
     return;
   }
 
+  const activationKey = activationKeyInput ? activationKeyInput.value.trim() : '';
+  if (isPremium && !activationKey) {
+    setStatus('Premium Mode requires a valid activation key.', 'error');
+    return;
+  }
+
   setBusy(true);
   setStatus('Contacting the Skylar XD pairing gateway…');
   try {
     const response = await fetch(PAIRING_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ phone, botType: 'skylar' }),
+      body: JSON.stringify({ phone, botType: 'skylar', activationKey, mode: isPremium ? 'premium' : 'free' }),
     });
     const data = await readJson(response);
     const pairing = data.pairing || data;
