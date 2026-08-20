@@ -1,660 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#17100f" />
-    <meta name="description" content="Skylar XD Enterprise Admin Dashboard" />
-    <title>𝑺𝑲𝒀𝑳𝑨𝑹 𝑿𝑫 · Enterprise Admin Suite</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600;1,700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css" />
-    <style>
-      .auth-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 99;
-        display: grid;
-        place-items: center;
-        background: rgba(12, 6, 5, 0.95);
-        backdrop-filter: blur(18px);
-        padding: 20px;
-      }
-      .auth-card {
-        width: min(440px, 100%);
-        padding: 38px;
-        border: 1px solid rgba(243, 180, 134, 0.35);
-        border-radius: 18px;
-        background: linear-gradient(145deg, rgba(38, 22, 18, 0.95), rgba(22, 12, 10, 0.98));
-        box-shadow: var(--shadow);
-        display: grid;
-        gap: 20px;
-        text-align: center;
-      }
-      .auth-card h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.8rem; margin: 0; color: var(--ink); }
-      .auth-card input {
-        width: 100%;
-        padding: 14px 16px;
-        border: 1px solid var(--line-strong);
-        border-radius: 10px;
-        background: rgba(20, 10, 8, 0.85);
-        color: var(--ink);
-        text-align: center;
-        font-size: 1.1rem;
-        letter-spacing: 0.15em;
-        outline: none;
-      }
-      .tab-nav {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin: 0 32px 28px;
-        padding: 8px;
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(30, 17, 14, 0.58);
-        backdrop-filter: blur(12px);
-      }
-      .tab-btn {
-        flex: 1;
-        min-width: 95px;
-        padding: 9px 10px;
-        border: 1px solid transparent;
-        border-radius: 8px;
-        background: transparent;
-        color: var(--muted);
-        font-size: 0.68rem;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        transition: all 160ms var(--ease-out);
-      }
-      .tab-btn:hover { color: var(--ink); background: rgba(243, 180, 134, 0.08); }
-      .tab-btn.active { color: #24120c; background: var(--accent-strong); border-color: var(--accent-strong); box-shadow: 0 8px 24px rgba(243, 180, 134, 0.2); }
-      .tab-pane { display: none; }
-      .tab-pane.active { display: block; }
-      .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 16px;
-        font-size: 0.82rem;
-      }
-      .data-table th, .data-table td {
-        padding: 12px 14px;
-        text-align: left;
-        border-bottom: 1px solid var(--line);
-      }
-      .data-table th { color: var(--accent); font-weight: 700; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; }
-      .data-table td { color: var(--ink); }
-      .badge-pill {
-        display: inline-flex;
-        align-items: center;
-        padding: 3px 9px;
-        border-radius: 20px;
-        font-size: 0.62rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-      .badge-pill.success { background: rgba(153, 210, 158, 0.15); color: #99d29e; border: 1px solid rgba(153, 210, 158, 0.3); }
-      .badge-pill.warning { background: rgba(243, 180, 134, 0.15); color: var(--accent-strong); border: 1px solid rgba(243, 180, 134, 0.3); }
-      .badge-pill.danger { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-    </style>
-  </head>
-  <body>
-    <!-- Password Authentication Modal -->
-    <div class="auth-overlay" id="auth-overlay">
-      <div class="auth-card">
-        <p class="eyebrow" style="margin-bottom: 0;">Restricted Enterprise Portal</p>
-        <h2>Admin Authentication</h2>
-        <p class="hero-text" style="font-size: 0.88rem; margin: 0 auto; max-width: 320px;">Enter passcode <strong>skylar10</strong> to access the complete management suite.</p>
-        <form id="auth-form" style="display: grid; gap: 14px; margin-top: 5px;">
-          <input id="admin-pass" type="password" placeholder="••••••••" autocomplete="current-password" required />
-          <button class="button primary" type="submit" style="width: 100%;">Authorize Access ↗</button>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skylar XD - Enterprise Command Center</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .admin-shell { width: min(860px, 100% - 24px); margin: 0 auto; padding: 20px 0 60px; }
+    .login-container { max-width: 440px; margin: 60px auto; }
+    .admin-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; }
+    .tab-btn { padding: 10px 18px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: all 160ms ease; }
+    .tab-btn:hover, .tab-btn.active { border-color: rgba(251, 191, 36, 0.7); background: rgba(251, 191, 36, 0.15); color: #fde68a; }
+    .tab-content { display: none; }
+    .tab-content.active { display: grid; gap: 20px; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .metric-card { padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); display: grid; gap: 6px; }
+    .metric-card span { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-soft); }
+    .metric-card strong { font-family: "Playfair Display", serif; font-size: 1.6rem; font-style: italic; color: var(--text); }
+    .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem; }
+    th, td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+    th { color: var(--accent); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; background: rgba(251, 191, 36, 0.05); }
+    tr:last-child td { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div class="admin-shell">
+    <header class="topbar">
+      <a href="./index.html" class="back-button" title="Back to Portal"><span>←</span></a>
+      <div class="topbar-title">
+        <small>COMMAND SUITE</small>
+        <strong>Skylar XD Admin</strong>
+      </div>
+      <a href="./index.html" class="admin-icon-btn" title="Portal"><span>🏠</span></a>
+    </header>
+
+    <main class="main-content">
+      <div id="loginCard" class="admin-card login-container">
+        <h2>Administrator Login</h2>
+        <p class="section-text">Enter the secure passcode to unlock the enterprise management dashboard.</p>
+        <form onsubmit="handleAdminLogin(event)">
+          <div class="form-group">
+            <label for="adminPass">Passcode (skylar10)</label>
+            <input type="password" id="adminPass" placeholder="Enter passcode" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="submit-btn">Access Command Center</button>
         </form>
-        <div class="status-box error" id="auth-error" hidden style="margin-top: 0; font-size: 0.78rem;">Incorrect password. Use skylar10.</div>
-        <a href="./" style="color: var(--soft); font-size: 0.75rem; text-decoration: underline; margin-top: 5px;">← Return to Pairing Portal</a>
+        <div id="loginError" class="status-box error hidden" style="margin-top: 14px;">Incorrect passcode. Try skylar10.</div>
       </div>
-    </div>
 
-    <div class="ambient ambient-left" aria-hidden="true"></div>
-    <div class="ambient ambient-right" aria-hidden="true"></div>
-    <main class="shell">
-      <header class="topbar">
-        <a class="brand" href="./" aria-label="Skylar XD home">
-          <span class="brand-mark">S</span>
-          <span class="brand-copy">
-            <strong>𝑺𝑲𝒀𝑳𝑨𝑹 𝑿𝑫</strong>
-            <small>ENTERPRISE CONTROL CENTER</small>
-          </span>
-        </a>
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <a class="online-pill" href="./" style="text-decoration: none;">← Public Portal</a>
-          <button class="button ghost" id="logout-btn" type="button" style="min-height: 36px; padding: 0 12px; font-size: 0.7rem;">Lock Admin</button>
+      <div id="dashboardContent" class="hidden">
+        <div class="admin-tabs">
+          <button type="button" class="tab-btn active" onclick="switchTab(event, 'overviewTab')">Overview</button>
+          <button type="button" class="tab-btn" onclick="switchTab(event, 'licensingTab')">Licensing</button>
+          <button type="button" class="tab-btn" onclick="switchTab(event, 'usersTab')">Users</button>
+          <button type="button" class="tab-btn" onclick="switchTab(event, 'healthTab')">Bot Health</button>
+          <button type="button" class="tab-btn" onclick="switchTab(event, 'broadcastTab')">Broadcasts</button>
         </div>
-      </header>
 
-      <section class="hero" style="min-height: auto; padding: 40px 32px 25px;" aria-labelledby="admin-page-title">
-        <div class="hero-copy">
-          <p class="eyebrow">All-In-One Enterprise Suite</p>
-          <h1 id="admin-page-title" style="font-size: clamp(2.3rem, 4.5vw, 4rem);">Complete Admin<br /><em>&amp; Operations Suite.</em></h1>
-          <p class="hero-text">Database-ready modules covering advanced licensing, user management, real-time health, broadcast delivery tracking, rate limits, analytics, multi-admin roles, support tickets, and branding.</p>
+        <!-- OVERVIEW TAB -->
+        <div id="overviewTab" class="tab-content active">
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <span>Active Sessions</span>
+              <strong>128</strong>
+            </div>
+            <div class="metric-card">
+              <span>Gateway Mode</span>
+              <strong style="color: #4ade80;">Free Mode</strong>
+            </div>
+            <div class="metric-card">
+              <span>Pterodactyl Node</span>
+              <strong style="color: var(--accent);">Online (24/7)</strong>
+            </div>
+            <div class="metric-card">
+              <span>Total Keys Minted</span>
+              <strong>24</strong>
+            </div>
+          </div>
+
+          <section class="admin-card">
+            <h2>System Status &amp; Quick Actions</h2>
+            <p class="section-text">All systems are operating normally. The bot runtime is synchronized with the public portal.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+              <button type="button" class="submit-btn" style="width: auto; padding: 12px 20px; background: rgba(34, 197, 94, 0.2); color: #4ade80;" onclick="alert('Bot process synchronized successfully!')">Sync Bot Runtime</button>
+              <button type="button" class="submit-btn" style="width: auto; padding: 12px 20px; background: rgba(239, 68, 68, 0.2); color: #f87171;" onclick="alert('Maintenance mode toggled!')">Toggle Maintenance Mode</button>
+            </div>
+          </section>
         </div>
-      </section>
 
-      <!-- Navigation Tabs (12 Modules) -->
-      <nav class="tab-nav" aria-label="Admin Navigation">
-        <button class="tab-btn active" data-tab="tab-overview">Overview</button>
-        <button class="tab-btn" data-tab="tab-licensing">Licensing</button>
-        <button class="tab-btn" data-tab="tab-users">Users</button>
-        <button class="tab-btn" data-tab="tab-health">Health</button>
-        <button class="tab-btn" data-tab="tab-broadcasts">Broadcasts</button>
-        <button class="tab-btn" data-tab="tab-protection">Protection</button>
-        <button class="tab-btn" data-tab="tab-analytics">Analytics</button>
-        <button class="tab-btn" data-tab="tab-operations">Ops</button>
-        <button class="tab-btn" data-tab="tab-roles">Roles</button>
-        <button class="tab-btn" data-tab="tab-support">Support</button>
-        <button class="tab-btn" data-tab="tab-settings">Settings</button>
-        <button class="tab-btn" data-tab="tab-audit">Audit</button>
-      </nav>
-
-      <!-- 1. OVERVIEW -->
-      <div class="tab-pane active" id="tab-overview">
-        <section class="stat-row" aria-label="Core metrics">
-          <article class="stat-card"><strong>128</strong><span>Active Paired Users</span></article>
-          <article class="stat-card"><strong>ONLINE</strong><span>Pterodactyl Node #1</span></article>
-          <article class="stat-card"><strong>14</strong><span>Active Premium Keys</span></article>
-        </section>
-
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Enterprise Telemetry</p>
-              <h2>System Health &amp; Quick Status</h2>
+        <!-- LICENSING TAB -->
+        <div id="licensingTab" class="tab-content">
+          <section class="admin-card">
+            <div class="section-heading">
+              <h2>Gateway Policy</h2>
+              <span class="instance-pill">SYNCED</span>
             </div>
-            <span class="step-badge" id="overview-mode-badge">FREE MODE</span>
-          </div>
-          <p class="section-text">All 12 advanced administration modules are active and primed for Neon PostgreSQL synchronization. Use the tabs above to manage users, keys, broadcasts, security, and branding.</p>
-          <div class="admin-row" style="margin-top: 20px;">
-            <span class="admin-hint">Database status: <strong style="color: #99d29e;">Connected to Neon PostgreSQL</strong></span>
-            <button class="button primary" onclick="document.querySelector('[data-tab=\'tab-licensing\']').click()">Manage Licensing ↗</button>
-          </div>
-        </section>
-      </div>
-
-      <!-- 2. LICENSING -->
-      <div class="tab-pane" id="tab-licensing">
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Gateway Policy</p>
-              <h2>Licensing Mode Switcher</h2>
+            <p class="section-text">Control whether visitors need an activation key to pair their WhatsApp number.</p>
+            <div class="mode-toggle-group">
+              <button type="button" class="mode-btn active" id="freeModeBtn" onclick="setMode('free')">
+                <strong>Free Mode</strong>
+                <small>No key required for anyone</small>
+              </button>
+              <button type="button" class="mode-btn" id="premModeBtn" onclick="setMode('premium')">
+                <strong>Premium Mode</strong>
+                <small>Activation key required</small>
+              </button>
             </div>
-            <span class="step-badge" id="licensing-mode-badge">FREE MODE</span>
-          </div>
-          <p class="section-text">Toggle between Free Mode and Premium Mode instantly. In Premium Mode, the public pairing portal automatically requires a valid activation key.</p>
-          <div class="mode-toggle-group" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 20px;">
-            <button class="button mode-btn active" id="licensing-free-btn" type="button" style="justify-content: center; background: rgba(243, 180, 134, 0.15); border-color: var(--accent-strong);">Free Mode (No Key)</button>
-            <button class="button mode-btn ghost" id="licensing-prem-btn" type="button" style="justify-content: center;">Premium Mode (Key Required)</button>
-          </div>
+          </section>
 
-          <div style="margin-top: 24px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(30, 17, 14, 0.7);">
-            <strong style="color: var(--accent-strong); font-size: 0.9rem; display: block; margin-bottom: 6px;">How Premium Mode Connects & Works:</strong>
-            <p class="admin-hint" style="line-height: 1.6;">
-              1. <strong>Switch to Premium Mode</strong> above.<br/>
-              2. The public pairing portal (`index.html`) instantly detects the mode and reveals the <strong>Activation Key input field</strong>.<br/>
-              3. Administrators generate and distribute cryptographic keys (e.g., <code>SKXD-PREM-2026-XXXX</code>) from the <strong>Key Management</strong> panel below.<br/>
-              4. When a user submits their phone number and key, the backend verifies the key's validity, checks expiry/device limits, and grants WhatsApp pairing authorization.
-            </p>
-          </div>
-
-        </section>
-
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Advanced Keys</p>
-              <h2>Expiry, Device Limits &amp; Revocation</h2>
-            </div>
-            <span class="step-badge">SECURE</span>
-          </div>
-          <p class="section-text">Mint cryptographic keys with custom expiry dates, single-device or multi-device device caps, and instant search.</p>
-          
-          <div class="admin-row" style="margin-top: 15px;">
-            <input id="key-search" type="search" placeholder="Search activation keys..." style="flex: 1; padding: 12px 16px; border: 1px solid var(--line-strong); border-radius: 8px; background: rgba(20, 10, 8, 0.85); color: var(--ink); outline: none;" />
-            <button class="button primary" id="mint-key-btn" type="button">Mint Advanced Key ↗</button>
-          </div>
-
-          <div class="key-output" id="minted-key-box" hidden style="margin-top: 16px;">
-            <span id="minted-key-text">SKXD-PREM-2026-XXXX</span>
-            <button id="mint-copy-btn" type="button">Copy Key</button>
-          </div>
-
-          <div style="overflow-x: auto; margin-top: 20px;">
-            <table class="data-table">
-              <thead>
-                <tr><th>Key Token</th><th>Device Cap</th><th>Expires</th><th>Status</th><th>Action</th></tr>
-              </thead>
-              <tbody id="keys-table-body">
-                <tr><td><code>SKXD-PREM-2026-A8F2</code></td><td>1 Device</td><td>30 Days</td><td><span class="badge-pill success">Active</span></td><td><button style="background:transparent; border:none; color:var(--accent); cursor:pointer;" onclick="this.closest('tr').remove()">Revoke</button></td></tr>
-                <tr><td><code>SKXD-PREM-2026-9B41</code></td><td>Unlimited</td><td>Never</td><td><span class="badge-pill success">Active</span></td><td><button style="background:transparent; border:none; color:var(--accent); cursor:pointer;" onclick="this.closest('tr').remove()">Revoke</button></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <!-- 3. USERS -->
-      <div class="tab-pane" id="tab-users">
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">User Management</p>
-              <h2>Paired Sessions &amp; Device Control</h2>
-            </div>
-            <span class="step-badge">128 USERS</span>
-          </div>
-          <p class="section-text">Search users by phone number, check last seen timestamps, toggle Free/Premium tier, or force-disconnect a compromised session.</p>
-          
-          <div class="admin-row" style="margin-top: 15px;">
-            <input type="search" placeholder="Filter by phone number..." style="flex: 1; padding: 12px 16px; border: 1px solid var(--line-strong); border-radius: 8px; background: rgba(20, 10, 8, 0.85); color: var(--ink); outline: none;" />
-          </div>
-
-          <div style="overflow-x: auto; margin-top: 16px;">
-            <table class="data-table">
-              <thead>
-                <tr><th>Phone Number</th><th>Tier</th><th>Last Seen</th><th>Status</th><th>Actions</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>+254 712 345 678</td><td><span class="badge-pill warning">Premium</span></td><td>Just now</td><td><span class="badge-pill success">Connected</span></td><td><button style="background:transparent; border:none; color:#f87171; cursor:pointer;" onclick="alert('Session terminated.')">Disconnect</button></td></tr>
-                <tr><td>+254 733 998 112</td><td><span class="badge-pill">Free</span></td><td>2 mins ago</td><td><span class="badge-pill success">Connected</span></td><td><button style="background:transparent; border:none; color:#f87171; cursor:pointer;" onclick="alert('Session terminated.')">Disconnect</button></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <!-- 4. HEALTH -->
-      <div class="tab-pane" id="tab-health">
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Runtime Telemetry</p>
-              <h2>Real-Time Pterodactyl Bot Health</h2>
-            </div>
-            <span class="badge-pill success">HEALTHY</span>
-          </div>
-          <p class="section-text">Live resource utilization, container status, and remote daemon commands.</p>
-          
-          <div class="stat-row" style="padding: 0; margin-top: 20px;">
-            <article class="stat-card"><strong>CPU</strong><span>1.4% / 100%</span></article>
-            <article class="stat-card"><strong>RAM</strong><span>142 MB / 2048 MB</span></article>
-            <article class="stat-card"><strong>UPTIME</strong><span>6 days, 14 hours</span></article>
-          </div>
-
-          <div class="admin-row" style="margin-top: 24px;">
-            <span class="admin-hint">Container control actions</span>
-            <div style="display: flex; gap: 10px;">
-              <button class="button ghost" onclick="alert('Bot restart signal sent.')">Restart Bot</button>
-              <button class="button primary" onclick="alert('Logs downloaded.')">Download Logs</button>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <!-- 5. BROADCASTS -->
-      <div class="tab-pane" id="tab-broadcasts">
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Announcements</p>
-              <h2>Broadcast Delivery Tracking</h2>
-            </div>
-            <span class="step-badge">DELIVERY LOG</span>
-          </div>
-          <p class="section-text">Send announcements to all active sessions and track delivery status in real time.</p>
-          
-          <form id="broadcast-form" novalidate style="display: grid; gap: 16px; margin-top: 20px;">
-            <label for="broadcast-msg" style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);">Broadcast Message</label>
-            <textarea id="broadcast-msg" rows="3" placeholder="Type notification update for connected Skylar users..." required style="width: 100%; padding: 14px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: rgba(20, 10, 8, 0.85); color: var(--ink); outline: none; resize: vertical;"></textarea>
-            <div class="admin-row">
-              <span class="admin-hint">Target: All 128 active sessions</span>
-              <button class="button primary" type="submit">Send &amp; Track Broadcast ↗</button>
-            </div>
-          </form>
-          <div class="status-box" id="broadcast-status" role="status" aria-live="polite" hidden style="margin-top: 16px;"></div>
-
-          <div style="overflow-x: auto; margin-top: 24px;">
-            <table class="data-table">
-              <thead>
-                <tr><th>Message Preview</th><th>Target Count</th><th>Delivered</th><th>Failed</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>Skylar v2.4 update rolling out...</td><td>128</td><td><span style="color: #99d29e;">128 (100%)</span></td><td>0</td></tr>
-                <tr><td>Scheduled maintenance notice...</td><td>125</td><td><span style="color: #99d29e;">125 (100%)</span></td><td>0</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <!-- 6. PROTECTION -->
-      <div class="tab-pane" id="tab-protection">
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Security &amp; Abuse</p>
-              <h2>Pairing Protection &amp; Rate Limits</h2>
-            </div>
-            <span class="step-badge">ACTIVE</span>
-          </div>
-          <p class="section-text">Configure IP rate limits, duplicate-number detection, and spam blacklists to protect the pairing portal.</p>
-          
-          <div style="display: grid; gap: 16px; margin-top: 20px;">
-            <div class="admin-row" style="padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(30, 17, 14, 0.4);">
-              <div>
-                <strong>IP Rate Limiting (5 requests / 10 min)</strong>
-                <p class="admin-hint">Blocks excessive automated pairing attempts.</p>
+          <section class="admin-card">
+            <h2>Activation Key Generator</h2>
+            <p class="section-text">Mint cryptographic tokens with customizable expiration and device limits.</p>
+            <button type="button" class="submit-btn" onclick="generateKey()">Generate Secure Key</button>
+            <div id="generatedKeyWrap" class="hidden" style="margin-top: 16px;">
+              <div class="key-output">
+                <span id="keyValue">TOKEN-PREM-2026-XXXX</span>
+                <button type="button" class="copy-btn" onclick="copyKey()">Copy Key</button>
               </div>
-              <span class="badge-pill success">Enforced</span>
             </div>
-            <div class="admin-row" style="padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(30, 17, 14, 0.4);">
-              <div>
-                <strong>Duplicate Number Prevention</strong>
-                <p class="admin-hint">Prevents spamming the WhatsApp pairing gateway.</p>
+          </section>
+        </div>
+
+        <!-- USERS TAB -->
+        <div id="usersTab" class="tab-content">
+          <section class="admin-card">
+            <h2>Connected WhatsApp Users</h2>
+            <p class="section-text">Directory of all active sessions paired through the portal.</p>
+            <div class="table-wrap" style="margin-top: 16px;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Phone Number</th>
+                    <th>Tier</th>
+                    <th>Paired Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>+254 712 345 678</td>
+                    <td><span style="color: var(--accent);">Premium</span></td>
+                    <td>Today, 14:22</td>
+                    <td><span style="color: #4ade80;">● Active</span></td>
+                  </tr>
+                  <tr>
+                    <td>+254 798 123 456</td>
+                    <td>Free</td>
+                    <td>Yesterday, 09:15</td>
+                    <td><span style="color: #4ade80;">● Active</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <!-- HEALTH TAB -->
+        <div id="healthTab" class="tab-content">
+          <section class="admin-card">
+            <h2>Pterodactyl Container Telemetry</h2>
+            <p class="section-text">Real-time server diagnostics and container controls.</p>
+            <div class="stat-grid" style="margin-top: 16px;">
+              <div class="stat-box">
+                <span class="stat-lbl">CPU Usage</span>
+                <strong>1.4%</strong>
               </div>
-              <span class="badge-pill success">Enforced</span>
+              <div class="stat-box">
+                <span class="stat-lbl">Memory Allocation</span>
+                <strong>184 MB / 1024 MB</strong>
+              </div>
             </div>
-          </div>
-        </section>
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+              <button type="button" class="submit-btn" style="background: rgba(251, 191, 36, 0.2); color: #fde68a;" onclick="alert('Pterodactyl restart command sent!')">Restart Container</button>
+              <button type="button" class="submit-btn" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;" onclick="alert('Downloading container console logs...')">Download Logs</button>
+            </div>
+          </section>
+        </div>
+
+        <!-- BROADCAST TAB -->
+        <div id="broadcastTab" class="tab-content">
+          <section class="admin-card">
+            <h2>Broadcast Announcement</h2>
+            <p class="section-text">Dispatch instant updates to all connected WhatsApp sessions.</p>
+            <form onsubmit="handleBroadcast(event)">
+              <div class="form-group">
+                <label for="broadcastMsg">Message Content</label>
+                <textarea id="broadcastMsg" rows="4" placeholder="Type announcement update here..." style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--card-bg); color: var(--text); font-family: inherit; resize: vertical;" required></textarea>
+              </div>
+              <button type="submit" class="submit-btn">Send Broadcast Now</button>
+            </form>
+            <div id="broadcastSuccess" class="status-box success hidden" style="margin-top: 14px;">Broadcast successfully dispatched to all active sessions!</div>
+          </section>
+        </div>
       </div>
-
-      <!-- 7. ANALYTICS -->
-      <div class="tab-pane" id="tab-analytics">
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Enterprise Telemetry</p>
-              <h2>Expanded Analytics &amp; Conversion</h2>
-            </div>
-            <span class="step-badge">LIVE METRICS</span>
-          </div>
-          <p class="section-text">Daily pairings, active users, failed request rates, and Free-to-Premium conversion breakdown.</p>
-          
-          <div class="stat-row" style="padding: 0; margin-top: 20px;">
-            <article class="stat-card"><strong>94%</strong><span>Free Mode Pairs</span></article>
-            <article class="stat-card"><strong>6%</strong><span>Premium Activations</span></article>
-            <article class="stat-card"><strong>0.2%</strong><span>Failure / Retry Rate</span></article>
-          </div>
-        </section>
-      </div>
-
-      <!-- 8. OPERATIONS -->
-      <div class="tab-pane" id="tab-operations">
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Portal Ops</p>
-              <h2>Maintenance Mode &amp; Public Banner</h2>
-            </div>
-            <span class="step-badge">OPS</span>
-          </div>
-          <p class="section-text">Pause public pairing instantly or broadcast an announcement banner across the top of the pairing portal.</p>
-          
-          <div class="admin-row" style="margin-top: 20px;">
-            <div>
-              <strong>Global Maintenance Mode</strong>
-              <p class="admin-hint">Pauses pairing requests with a polite notice.</p>
-            </div>
-            <button class="button ghost" id="maintenance-toggle" type="button">Enable Maintenance</button>
-          </div>
-
-          <div style="margin-top: 24px; display: grid; gap: 12px;">
-            <label for="banner-text" style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);">Custom Public Announcement Banner</label>
-            <input id="banner-text" type="text" placeholder="e.g. Skylar v2.4 update rolling out today!" style="width: 100%; padding: 12px 16px; border: 1px solid var(--line-strong); border-radius: 8px; background: rgba(20, 10, 8, 0.85); color: var(--ink); outline: none;" />
-            <button class="button primary" style="width: fit-content;" onclick="alert('Public banner published.')">Publish Banner ↗</button>
-          </div>
-        </section>
-      </div>
-
-      <!-- 9. ROLES -->
-      <div class="tab-pane" id="tab-roles">
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Access Control</p>
-              <h2>Multi-Admin Roles &amp; Permissions</h2>
-            </div>
-            <span class="step-badge">RBAC</span>
-          </div>
-          <p class="section-text">Assign administrator roles (Owner, Manager, Support, Read-only) to secure the control center.</p>
-          
-          <div style="overflow-x: auto; margin-top: 16px;">
-            <table class="data-table">
-              <thead>
-                <tr><th>Administrator</th><th>Role</th><th>Access Level</th><th>Status</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>frozenlorddev</td><td><span class="badge-pill warning">Owner</span></td><td>Full Control</td><td><span class="badge-pill success">Active</span></td></tr>
-                <tr><td>support_agent_1</td><td><span class="badge-pill">Support</span></td><td>Tickets &amp; Users</td><td><span class="badge-pill success">Active</span></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <!-- 10. SUPPORT -->
-      <div class="tab-pane" id="tab-support">
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Help Desk</p>
-              <h2>Support Tickets &amp; Pairing Assistance</h2>
-            </div>
-            <span class="step-badge">TICKETS</span>
-          </div>
-          <p class="section-text">Review pairing failure reports submitted by users and mark issues as resolved.</p>
-          
-          <div style="overflow-x: auto; margin-top: 16px;">
-            <table class="data-table">
-              <thead>
-                <tr><th>User Phone</th><th>Issue Reported</th><th>Time</th><th>Status</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>+254 799 112 334</td><td>Pairing code expired before linking</td><td>10 mins ago</td><td><button style="background:transparent; border:none; color:var(--accent); cursor:pointer;" onclick="this.closest('tr').remove()">Mark Resolved</button></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <!-- 11. SETTINGS -->
-      <div class="tab-pane" id="tab-settings">
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Customization</p>
-              <h2>Branding &amp; Portal Settings</h2>
-            </div>
-            <span class="step-badge">CONFIG</span>
-          </div>
-          <p class="section-text">Customize bot title, Telegram fallback link, support text, and brand assets.</p>
-          
-          <div style="display: grid; gap: 14px; margin-top: 20px;">
-            <div>
-              <label style="font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Telegram Support Link</label>
-              <input type="text" value="https://t.me/blacklordProjects_bot?start=skylar" style="width: 100%; margin-top: 6px; padding: 12px 16px; border: 1px solid var(--line-strong); border-radius: 8px; background: rgba(20, 10, 8, 0.85); color: var(--ink); outline: none;" />
-            </div>
-            <div>
-              <label style="font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Admin Passcode</label>
-              <input type="text" value="skylar10" style="width: 100%; margin-top: 6px; padding: 12px 16px; border: 1px solid var(--line-strong); border-radius: 8px; background: rgba(20, 10, 8, 0.85); color: var(--ink); outline: none;" />
-            </div>
-            <button class="button primary" style="width: fit-content;" onclick="alert('Settings saved.')">Save Settings ↗</button>
-          </div>
-        </section>
-      </div>
-
-      <!-- 12. AUDIT -->
-      <div class="tab-pane" id="tab-audit">
-        <section class="admin-card">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Security Audit</p>
-              <h2>Admin Activity &amp; System Logs</h2>
-            </div>
-            <span class="step-badge">SECURE</span>
-          </div>
-          <p class="section-text">Complete chronological record of administrative actions, logins, and key mints.</p>
-          
-          <div style="overflow-x: auto; margin-top: 16px;">
-            <table class="data-table">
-              <thead>
-                <tr><th>Timestamp</th><th>Admin</th><th>Action</th><th>Details</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>Aug 20, 2026 · 15:55</td><td>frozenlorddev</td><td>Admin Auth</td><td>Successful login</td></tr>
-                <tr><td>Aug 20, 2026 · 15:56</td><td>frozenlorddev</td><td>Mode Switch</td><td>Switched to Free Mode</td></tr>
-                <tr><td>Aug 20, 2026 · 15:58</td><td>frozenlorddev</td><td>Key Minted</td><td>Generated advanced key</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <footer class="footer"><span>𝑺𝑲𝒀𝑳𝑨𝑹 𝑿𝑫</span><span>Enterprise Control Center · Database-Ready</span><a href="https://github.com/blacklorddev15/skylar" target="_blank" rel="noopener noreferrer">Source ↗</a></footer>
     </main>
 
-    <script>
-      const tabBtns = document.querySelectorAll('.tab-btn');
-      const tabPanes = document.querySelectorAll('.tab-pane');
+    <footer class="footer">
+      <span>Skylar XD Enterprise Ecosystem</span>
+      <a href="./index.html">Back to Portal</a>
+    </footer>
+  </div>
 
-      tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          tabBtns.forEach(b => b.classList.remove('active'));
-          tabPanes.forEach(p => p.classList.remove('active'));
-          btn.classList.add('active');
-          const target = document.getElementById(btn.getAttribute('data-tab'));
-          if (target) target.classList.add('active');
-        });
-      });
+  <script>
+    function handleAdminLogin(event) {
+      event.preventDefault();
+      const pass = document.getElementById('adminPass').value.trim();
+      const errBox = document.getElementById('loginError');
+      const loginCard = document.getElementById('loginCard');
+      const dashboard = document.getElementById('dashboardContent');
 
-      const authOverlay = document.querySelector('#auth-overlay');
-      const authForm = document.querySelector('#auth-form');
-      const adminPass = document.querySelector('#admin-pass');
-      const authError = document.querySelector('#auth-error');
-      const logoutBtn = document.querySelector('#logout-btn');
-
-      if (localStorage.getItem('skylar_authed') === 'true') {
-        authOverlay.style.display = 'none';
+      if (pass === 'skylar10') {
+        loginCard.classList.add('hidden');
+        dashboard.classList.remove('hidden');
+      } else {
+        errBox.classList.remove('hidden');
       }
+    }
 
-      authForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const pwd = adminPass.value.trim();
-        if (pwd === 'skylar10') {
-          localStorage.setItem('skylar_authed', 'true');
-          authOverlay.style.display = 'none';
-        } else {
-          authError.hidden = false;
-          adminPass.value = '';
-        }
-      });
+    function switchTab(event, tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
 
-      logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('skylar_authed');
-        authOverlay.style.display = 'grid';
-        adminPass.value = '';
-      });
-
-      const freeBtn = document.querySelector('#licensing-free-btn');
-      const premBtn = document.querySelector('#licensing-prem-btn');
-      const modeBadge = document.querySelector('#licensing-mode-badge');
-      const overviewBadge = document.querySelector('#overview-mode-badge');
-
-      let currentMode = localStorage.getItem('skylar_mode') || 'free';
-
-      function setAdminMode(mode) {
-        currentMode = mode;
-        localStorage.setItem('skylar_mode', mode);
-        if (mode === 'premium') {
-          modeBadge.textContent = 'PREMIUM MODE';
-          modeBadge.style.color = '#ffcca7';
-          overviewBadge.textContent = 'PREMIUM MODE';
-          overviewBadge.style.color = '#ffcca7';
-          premBtn.style.background = 'rgba(243, 180, 134, 0.15)';
-          premBtn.style.borderColor = 'var(--accent-strong)';
-          premBtn.className = 'button mode-btn active';
-          freeBtn.style.background = 'transparent';
-          freeBtn.style.borderColor = 'transparent';
-          freeBtn.className = 'button mode-btn ghost';
-        } else {
-          modeBadge.textContent = 'FREE MODE';
-          modeBadge.style.color = '';
-          overviewBadge.textContent = 'FREE MODE';
-          overviewBadge.style.color = '';
-          freeBtn.style.background = 'rgba(243, 180, 134, 0.15)';
-          freeBtn.style.borderColor = 'var(--accent-strong)';
-          freeBtn.className = 'button mode-btn active';
-          premBtn.style.background = 'transparent';
-          premBtn.style.borderColor = 'transparent';
-          premBtn.className = 'button mode-btn ghost';
-        }
+    function setMode(mode) {
+      const freeBtn = document.getElementById('freeModeBtn');
+      const premBtn = document.getElementById('premModeBtn');
+      if (mode === 'free') {
+        freeBtn.classList.add('active');
+        premBtn.classList.remove('active');
+        alert('Gateway policy updated to Free Mode.');
+      } else {
+        premBtn.classList.add('active');
+        freeBtn.classList.remove('active');
+        alert('Gateway policy updated to Premium Mode.');
       }
+    }
 
-      setAdminMode(currentMode);
-      freeBtn.addEventListener('click', () => setAdminMode('free'));
-      premBtn.addEventListener('click', () => setAdminMode('premium'));
+    function generateKey() {
+      const wrap = document.getElementById('generatedKeyWrap');
+      const val = document.getElementById('keyValue');
+      const randomKey = 'TOKEN-PREM-2026-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      val.textContent = randomKey;
+      wrap.classList.remove('hidden');
+    }
 
-      const mintBtn = document.querySelector('#mint-key-btn');
-      const mintBox = document.querySelector('#minted-key-box');
-      const mintText = document.querySelector('#minted-key-text');
-      const mintCopy = document.querySelector('#mint-copy-btn');
-      const keysTable = document.querySelector('#keys-table-body');
-
-      mintBtn.addEventListener('click', () => {
-        const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
-        const key = `SKXD-PREM-2026-${rand}`;
-        mintText.textContent = key;
-        mintBox.hidden = false;
-        
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td><code>${key}</code></td><td>1 Device</td><td>30 Days</td><td><span class="badge-pill success">Active</span></td><td><button style="background:transparent; border:none; color:var(--accent); cursor:pointer;" onclick="this.closest('tr').remove()">Revoke</button></td>`;
-        keysTable.prepend(tr);
+    function copyKey() {
+      const key = document.getElementById('keyValue').textContent;
+      navigator.clipboard.writeText(key).then(() => {
+        alert('Activation key copied: ' + key);
       });
+    }
 
-      mintCopy.addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(mintText.textContent.trim());
-          mintCopy.textContent = 'Copied';
-          setTimeout(() => { mintCopy.textContent = 'Copy Key'; }, 1500);
-        } catch {}
-      });
-
-      const broadcastForm = document.querySelector('#broadcast-form');
-      const broadcastMsg = document.querySelector('#broadcast-msg');
-      const broadcastStatus = document.querySelector('#broadcast-status');
-
-      broadcastForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const msg = broadcastMsg.value.trim();
-        if (!msg) return;
-        broadcastStatus.hidden = false;
-        broadcastStatus.className = 'status-box success';
-        broadcastStatus.textContent = 'Broadcast dispatched & verified delivered to all 128 active sessions.';
-        broadcastMsg.value = '';
-        setTimeout(() => { broadcastStatus.hidden = true; }, 4000);
-      });
-
-      const maintBtn = document.querySelector('#maintenance-toggle');
-      let maintActive = false;
-      maintBtn.addEventListener('click', () => {
-        maintActive = !maintActive;
-        maintBtn.textContent = maintActive ? 'Disable Maintenance' : 'Enable Maintenance';
-        maintBtn.style.borderColor = maintActive ? '#ef4444' : '';
-        maintBtn.style.color = maintActive ? '#ef4444' : '';
-        alert(maintActive ? 'Maintenance mode enabled.' : 'Maintenance mode disabled.');
-      });
-    </script>
-  </body>
+    function handleBroadcast(event) {
+      event.preventDefault();
+      const successBox = document.getElementById('broadcastSuccess');
+      successBox.classList.remove('hidden');
+      setTimeout(() => successBox.classList.add('hidden'), 4000);
+      event.target.reset();
+    }
+  </script>
+</body>
 </html>
