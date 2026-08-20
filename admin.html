@@ -3,28 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skylar XD - Enterprise Command Center</title>
+  <title>Skylar XD - Admin Command Center</title>
   <link rel="stylesheet" href="./styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    .admin-shell { width: min(860px, 100% - 24px); margin: 0 auto; padding: 20px 0 60px; }
-    .login-container { max-width: 440px; margin: 60px auto; }
-    .admin-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; }
-    .tab-btn { padding: 10px 18px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: all 160ms ease; }
-    .tab-btn:hover, .tab-btn.active { border-color: rgba(251, 191, 36, 0.7); background: rgba(251, 191, 36, 0.15); color: #fde68a; }
-    .tab-content { display: none; }
-    .tab-content.active { display: grid; gap: 20px; }
-    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
-    .metric-card { padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); display: grid; gap: 6px; }
-    .metric-card span { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-soft); }
-    .metric-card strong { font-family: "Playfair Display", serif; font-size: 1.6rem; font-style: italic; color: var(--text); }
-    .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem; }
-    th, td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
-    th { color: var(--accent); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; background: rgba(251, 191, 36, 0.05); }
-    tr:last-child td { border-bottom: none; }
+    /* Phone-sized shell container matching landing page proportions */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #09090b;
+      margin: 0;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+    .admin-shell {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      overflow-y: auto;
+      max-height: 92vh;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    .admin-shell::-webkit-scrollbar {
+      width: 4px;
+    }
+    .admin-shell::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+    .login-container {
+      margin: 20px auto;
+      max-width: 100%;
+    }
+    .admin-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 16px;
+    }
+    .admin-tabs::-webkit-scrollbar {
+      height: 3px;
+    }
+    .admin-tabs::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+    .tab-btn {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 160ms ease;
+    }
+    .tab-btn:hover, .tab-btn.active {
+      border-color: rgba(251, 191, 36, 0.7);
+      background: rgba(251, 191, 36, 0.15);
+      color: #fde68a;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: grid;
+      gap: 16px;
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .metric-card {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      display: grid;
+      gap: 4px;
+    }
+    .metric-card span {
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-soft);
+    }
+    .metric-card strong {
+      font-family: "Playfair Display", serif;
+      font-size: 1.25rem;
+      font-style: italic;
+      color: var(--text);
+    }
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.75rem;
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    th {
+      color: var(--accent);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(251, 191, 36, 0.05);
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
   </style>
 </head>
 <body>
@@ -32,24 +145,24 @@
     <header class="topbar">
       <a href="./index.html" class="back-button" title="Back to Portal"><span>←</span></a>
       <div class="topbar-title">
-        <small>COMMAND SUITE</small>
-        <strong>Skylar XD Admin</strong>
+        <small>MOBILE ADMIN</small>
+        <strong>Skylar XD</strong>
       </div>
       <a href="./index.html" class="admin-icon-btn" title="Portal"><span>🏠</span></a>
     </header>
 
     <main class="main-content">
       <div id="loginCard" class="admin-card login-container">
-        <h2>Administrator Login</h2>
-        <p class="section-text">Enter the secure passcode to unlock the enterprise management dashboard.</p>
+        <h2>Admin Login</h2>
+        <p class="section-text">Enter passcode (skylar10) to access management console.</p>
         <form onsubmit="handleAdminLogin(event)">
           <div class="form-group">
-            <label for="adminPass">Passcode (skylar10)</label>
+            <label for="adminPass">Secure Passcode</label>
             <input type="password" id="adminPass" placeholder="Enter passcode" required autocomplete="current-password">
           </div>
-          <button type="submit" class="submit-btn">Access Command Center</button>
+          <button type="submit" class="submit-btn">Unlock Console</button>
         </form>
-        <div id="loginError" class="status-box error hidden" style="margin-top: 14px;">Incorrect passcode. Try skylar10.</div>
+        <div id="loginError" class="status-box error hidden" style="margin-top: 12px;">Incorrect passcode. Try skylar10.</div>
       </div>
 
       <div id="dashboardContent" class="hidden">
@@ -57,37 +170,37 @@
           <button type="button" class="tab-btn active" onclick="switchTab(event, 'overviewTab')">Overview</button>
           <button type="button" class="tab-btn" onclick="switchTab(event, 'licensingTab')">Licensing</button>
           <button type="button" class="tab-btn" onclick="switchTab(event, 'usersTab')">Users</button>
-          <button type="button" class="tab-btn" onclick="switchTab(event, 'healthTab')">Bot Health</button>
-          <button type="button" class="tab-btn" onclick="switchTab(event, 'broadcastTab')">Broadcasts</button>
+          <button type="button" class="tab-btn" onclick="switchTab(event, 'healthTab')">Health</button>
+          <button type="button" class="tab-btn" onclick="switchTab(event, 'broadcastTab')">Broadcast</button>
         </div>
 
         <!-- OVERVIEW TAB -->
         <div id="overviewTab" class="tab-content active">
           <div class="metrics-grid">
             <div class="metric-card">
-              <span>Active Sessions</span>
+              <span>Sessions</span>
               <strong>128</strong>
             </div>
             <div class="metric-card">
-              <span>Gateway Mode</span>
-              <strong style="color: #4ade80;">Free Mode</strong>
+              <span>Mode</span>
+              <strong style="color: #4ade80; font-size: 1rem;">Free Mode</strong>
             </div>
             <div class="metric-card">
-              <span>Pterodactyl Node</span>
-              <strong style="color: var(--accent);">Online (24/7)</strong>
+              <span>Pterodactyl</span>
+              <strong style="color: var(--accent); font-size: 1rem;">Online</strong>
             </div>
             <div class="metric-card">
-              <span>Total Keys Minted</span>
-              <strong>24</strong>
+              <span>Keys</span>
+              <strong>24 Minted</strong>
             </div>
           </div>
 
           <section class="admin-card">
-            <h2>System Status &amp; Quick Actions</h2>
-            <p class="section-text">All systems are operating normally. The bot runtime is synchronized with the public portal.</p>
-            <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
-              <button type="button" class="submit-btn" style="width: auto; padding: 12px 20px; background: rgba(34, 197, 94, 0.2); color: #4ade80;" onclick="alert('Bot process synchronized successfully!')">Sync Bot Runtime</button>
-              <button type="button" class="submit-btn" style="width: auto; padding: 12px 20px; background: rgba(239, 68, 68, 0.2); color: #f87171;" onclick="alert('Maintenance mode toggled!')">Toggle Maintenance Mode</button>
+            <h2>Quick Actions</h2>
+            <p class="section-text">Manage runtime state and maintenance mode.</p>
+            <div style="display: grid; gap: 8px; margin-top: 12px;">
+              <button type="button" class="submit-btn" style="padding: 10px; background: rgba(34, 197, 94, 0.2); color: #4ade80;" onclick="alert('Bot runtime synchronized!')">Sync Bot Runtime</button>
+              <button type="button" class="submit-btn" style="padding: 10px; background: rgba(239, 68, 68, 0.2); color: #f87171;" onclick="alert('Maintenance mode toggled!')">Toggle Maintenance</button>
             </div>
           </section>
         </div>
@@ -97,29 +210,29 @@
           <section class="admin-card">
             <div class="section-heading">
               <h2>Gateway Policy</h2>
-              <span class="instance-pill">SYNCED</span>
+              <span class="instance-pill">ACTIVE</span>
             </div>
-            <p class="section-text">Control whether visitors need an activation key to pair their WhatsApp number.</p>
+            <p class="section-text">Switch public pairing requirement mode.</p>
             <div class="mode-toggle-group">
               <button type="button" class="mode-btn active" id="freeModeBtn" onclick="setMode('free')">
-                <strong>Free Mode</strong>
-                <small>No key required for anyone</small>
+                <strong>Free</strong>
+                <small>No key needed</small>
               </button>
               <button type="button" class="mode-btn" id="premModeBtn" onclick="setMode('premium')">
-                <strong>Premium Mode</strong>
-                <small>Activation key required</small>
+                <strong>Premium</strong>
+                <small>Key required</small>
               </button>
             </div>
           </section>
 
           <section class="admin-card">
-            <h2>Activation Key Generator</h2>
-            <p class="section-text">Mint cryptographic tokens with customizable expiration and device limits.</p>
-            <button type="button" class="submit-btn" onclick="generateKey()">Generate Secure Key</button>
-            <div id="generatedKeyWrap" class="hidden" style="margin-top: 16px;">
+            <h2>Key Generator</h2>
+            <p class="section-text">Mint cryptographic activation tokens.</p>
+            <button type="button" class="submit-btn" onclick="generateKey()">Generate Key</button>
+            <div id="generatedKeyWrap" class="hidden" style="margin-top: 12px;">
               <div class="key-output">
-                <span id="keyValue">TOKEN-PREM-2026-XXXX</span>
-                <button type="button" class="copy-btn" onclick="copyKey()">Copy Key</button>
+                <span id="keyValue" style="font-size: 0.78rem;">TOKEN-PREM-2026-XXXX</span>
+                <button type="button" class="copy-btn" onclick="copyKey()">Copy</button>
               </div>
             </div>
           </section>
@@ -128,29 +241,26 @@
         <!-- USERS TAB -->
         <div id="usersTab" class="tab-content">
           <section class="admin-card">
-            <h2>Connected WhatsApp Users</h2>
-            <p class="section-text">Directory of all active sessions paired through the portal.</p>
-            <div class="table-wrap" style="margin-top: 16px;">
+            <h2>Active Users</h2>
+            <p class="section-text">Connected WhatsApp sessions.</p>
+            <div class="table-wrap" style="margin-top: 12px;">
               <table>
                 <thead>
                   <tr>
-                    <th>Phone Number</th>
+                    <th>Phone</th>
                     <th>Tier</th>
-                    <th>Paired Date</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>+254 712 345 678</td>
-                    <td><span style="color: var(--accent);">Premium</span></td>
-                    <td>Today, 14:22</td>
+                    <td>+254 712 345</td>
+                    <td><span style="color: var(--accent);">Prem</span></td>
                     <td><span style="color: #4ade80;">● Active</span></td>
                   </tr>
                   <tr>
-                    <td>+254 798 123 456</td>
+                    <td>+254 798 123</td>
                     <td>Free</td>
-                    <td>Yesterday, 09:15</td>
                     <td><span style="color: #4ade80;">● Active</span></td>
                   </tr>
                 </tbody>
@@ -162,21 +272,21 @@
         <!-- HEALTH TAB -->
         <div id="healthTab" class="tab-content">
           <section class="admin-card">
-            <h2>Pterodactyl Container Telemetry</h2>
-            <p class="section-text">Real-time server diagnostics and container controls.</p>
-            <div class="stat-grid" style="margin-top: 16px;">
+            <h2>Container Telemetry</h2>
+            <p class="section-text">Server load and logs.</p>
+            <div class="stat-grid" style="margin-top: 12px;">
               <div class="stat-box">
-                <span class="stat-lbl">CPU Usage</span>
+                <span class="stat-lbl">CPU</span>
                 <strong>1.4%</strong>
               </div>
               <div class="stat-box">
-                <span class="stat-lbl">Memory Allocation</span>
-                <strong>184 MB / 1024 MB</strong>
+                <span class="stat-lbl">RAM</span>
+                <strong>184M</strong>
               </div>
             </div>
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-              <button type="button" class="submit-btn" style="background: rgba(251, 191, 36, 0.2); color: #fde68a;" onclick="alert('Pterodactyl restart command sent!')">Restart Container</button>
-              <button type="button" class="submit-btn" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;" onclick="alert('Downloading container console logs...')">Download Logs</button>
+            <div style="display: grid; gap: 8px; margin-top: 14px;">
+              <button type="button" class="submit-btn" style="padding: 10px; background: rgba(251, 191, 36, 0.2); color: #fde68a;" onclick="alert('Restart command sent!')">Restart Bot</button>
+              <button type="button" class="submit-btn" style="padding: 10px; background: rgba(56, 189, 248, 0.2); color: #38bdf8;" onclick="alert('Logs downloaded!')">Get Logs</button>
             </div>
           </section>
         </div>
@@ -184,24 +294,24 @@
         <!-- BROADCAST TAB -->
         <div id="broadcastTab" class="tab-content">
           <section class="admin-card">
-            <h2>Broadcast Announcement</h2>
-            <p class="section-text">Dispatch instant updates to all connected WhatsApp sessions.</p>
+            <h2>Broadcast</h2>
+            <p class="section-text">Send announcement to sessions.</p>
             <form onsubmit="handleBroadcast(event)">
               <div class="form-group">
-                <label for="broadcastMsg">Message Content</label>
-                <textarea id="broadcastMsg" rows="4" placeholder="Type announcement update here..." style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--card-bg); color: var(--text); font-family: inherit; resize: vertical;" required></textarea>
+                <label for="broadcastMsg">Message</label>
+                <textarea id="broadcastMsg" rows="3" placeholder="Type broadcast..." style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); color: var(--text); font-family: inherit; resize: vertical;" required></textarea>
               </div>
-              <button type="submit" class="submit-btn">Send Broadcast Now</button>
+              <button type="submit" class="submit-btn">Broadcast Now</button>
             </form>
-            <div id="broadcastSuccess" class="status-box success hidden" style="margin-top: 14px;">Broadcast successfully dispatched to all active sessions!</div>
+            <div id="broadcastSuccess" class="status-box success hidden" style="margin-top: 10px;">Broadcast sent successfully!</div>
           </section>
         </div>
       </div>
     </main>
 
     <footer class="footer">
-      <span>Skylar XD Enterprise Ecosystem</span>
-      <a href="./index.html">Back to Portal</a>
+      <span>Skylar XD Enterprise</span>
+      <a href="./index.html">Portal</a>
     </footer>
   </div>
 
@@ -261,7 +371,7 @@
       event.preventDefault();
       const successBox = document.getElementById('broadcastSuccess');
       successBox.classList.remove('hidden');
-      setTimeout(() => successBox.classList.add('hidden'), 4000);
+      setTimeout(() => successBox.classList.add('hidden'), 3000);
       event.target.reset();
     }
   </script>
