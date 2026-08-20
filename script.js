@@ -124,3 +124,61 @@ copyCodeButton.addEventListener('click', async () => {
 phoneInput.addEventListener('input', () => {
   phoneInput.value = phoneInput.value.replace(/[^0-9\s]/g, '');
 });
+
+// Admin & Licensing Mode Management
+const modeBadge = document.querySelector('#mode-badge');
+const modeFreeBtn = document.querySelector('#mode-free-btn');
+const modePremiumBtn = document.querySelector('#mode-premium-btn');
+const adminActionTitle = document.querySelector('#admin-action-title');
+const adminActionDesc = document.querySelector('#admin-action-desc');
+const generateKeyBtn = document.querySelector('#generate-key-btn');
+const keyOutputBox = document.querySelector('#key-output-box');
+const generatedKeyText = document.querySelector('#generated-key-text');
+const copyKeyBtn = document.querySelector('#copy-key-btn');
+
+let isPremiumMode = false;
+
+function updateLicensingMode(premium) {
+  isPremiumMode = premium;
+  if (isPremiumMode) {
+    modeBadge.textContent = 'PREMIUM MODE';
+    modeBadge.style.color = '#ffcca7';
+    modePremiumBtn.classList.add('active');
+    modeFreeBtn.classList.remove('active');
+    adminActionTitle.textContent = 'Admin-Only Key Generation';
+    adminActionDesc.textContent = 'In Premium Mode, users must enter a valid activation key. Only authorized administrators can generate new keys here.';
+    generateKeyBtn.textContent = 'Generate Premium Key ↗';
+  } else {
+    modeBadge.textContent = 'FREE MODE';
+    modeBadge.style.color = '';
+    modeFreeBtn.classList.add('active');
+    modePremiumBtn.classList.remove('active');
+    adminActionTitle.textContent = 'Key Generation & Status';
+    adminActionDesc.textContent = 'In Free Mode, anyone can generate a session activation token or pair directly.';
+    generateKeyBtn.textContent = 'Generate Activation Key ↗';
+  }
+  keyOutputBox.hidden = true;
+}
+
+modeFreeBtn.addEventListener('click', () => updateLicensingMode(false));
+modePremiumBtn.addEventListener('click', () => updateLicensingMode(true));
+
+generateKeyBtn.addEventListener('click', () => {
+  const prefix = isPremiumMode ? 'SKXD-PREM-2026' : 'SKXD-FREE-2026';
+  const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const key = `${prefix}-${randomSuffix}`;
+  generatedKeyText.textContent = key;
+  keyOutputBox.hidden = false;
+});
+
+copyKeyBtn.addEventListener('click', async () => {
+  const key = generatedKeyText.textContent.trim();
+  if (!key) return;
+  try {
+    await navigator.clipboard.writeText(key);
+    copyKeyBtn.textContent = 'Copied';
+    window.setTimeout(() => { copyKeyBtn.textContent = 'Copy Key'; }, 1500);
+  } catch {
+    // fallback
+  }
+});

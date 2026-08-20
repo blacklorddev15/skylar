@@ -194,3 +194,85 @@ input::placeholder { color: #75635a; }
   .pair-card { animation: rise 700ms 130ms var(--ease-out) both; }
   @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 }
+
+.admin-card {
+  margin: 0 32px 32px;
+  padding: 34px 34px 38px;
+  border: 1px solid rgba(243, 180, 134, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(38, 22, 18, 0.88), rgba(22, 12, 10, 0.94));
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+.mode-toggle-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 22px 0 24px;
+}
+.mode-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-height: 72px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(45, 25, 21, 0.4);
+  color: var(--ink);
+  text-align: left;
+  transition: all 160ms var(--ease-out);
+}
+.mode-btn small {
+  color: var(--soft);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+}
+.mode-btn.active {
+  border-color: var(--accent-strong);
+  background: rgba(243, 180, 134, 0.12);
+  box-shadow: 0 0 24px rgba(243, 180, 134, 0.12);
+}
+.admin-panel {
+  display: grid;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.admin-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.key-output {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid rgba(243, 180, 134, 0.35);
+  border-radius: 10px;
+  background: rgba(20, 10, 8, 0.85);
+  font-family: monospace;
+  font-size: 0.95rem;
+  color: var(--accent-strong);
+  word-break: break-all;
+}
+.key-output button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(243, 180, 134, 0.15);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.admin-hint {
+  color: var(--soft);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  margin: 0;
+}
