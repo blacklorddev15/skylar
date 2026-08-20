@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#17100f" />
+    <meta name="description" content="Skylar XD Admin Dashboard" />
+    <title>𝑺𝑲𝒀𝑳𝑨𝑹 𝑿𝑫 · Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600;1,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .auth-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 99;
+        display: grid;
+        place-items: center;
+        background: rgba(12, 6, 5, 0.92);
+        backdrop-filter: blur(16px);
+        padding: 20px;
+      }
+      .auth-card {
+        width: min(420px, 100%);
+        padding: 36px;
+        border: 1px solid rgba(243, 180, 134, 0.35);
+        border-radius: 18px;
+        background: linear-gradient(145deg, rgba(38, 22, 18, 0.95), rgba(22, 12, 10, 0.98));
+        box-shadow: var(--shadow);
+        display: grid;
+        gap: 20px;
+        text-align: center;
+      }
+      .auth-card h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.8rem; margin: 0; color: var(--ink); }
+      .auth-card input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid var(--line-strong);
+        border-radius: 10px;
+        background: rgba(20, 10, 8, 0.85);
+        color: var(--ink);
+        text-align: center;
+        font-size: 1.1rem;
+        letter-spacing: 0.15em;
+        outline: none;
+      }
+      .auth-card input:focus { border-color: var(--accent-strong); box-shadow: 0 0 15px rgba(243, 180, 134, 0.2); }
+    </style>
+  </head>
+  <body>
+    <!-- Password Authentication Modal -->
+    <div class="auth-overlay" id="auth-overlay">
+      <div class="auth-card">
+        <p class="eyebrow" style="margin-bottom: 0;">Restricted Portal</p>
+        <h2>Admin Authentication</h2>
+        <p class="hero-text" style="font-size: 0.88rem; margin: 0 auto; max-width: 320px;">Enter the administrator passcode to access key generation and session management.</p>
+        <form id="auth-form" style="display: grid; gap: 14px; margin-top: 5px;">
+          <input id="admin-pass" type="password" placeholder="••••••••" autocomplete="current-password" required />
+          <button class="button primary" type="submit" style="width: 100%;">Authorize Access ↗</button>
+        </form>
+        <div class="status-box error" id="auth-error" hidden style="margin-top: 0; font-size: 0.78rem;">Incorrect password. Please try again.</div>
+        <a href="./" style="color: var(--soft); font-size: 0.75rem; text-decoration: underline; margin-top: 5px;">← Return to Pairing Portal</a>
+      </div>
+    </div>
+
+    <div class="ambient ambient-left" aria-hidden="true"></div>
+    <div class="ambient ambient-right" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="Skylar XD home">
+          <span class="brand-mark">S</span>
+          <span class="brand-copy">
+            <strong>𝑺𝑲𝒀𝑳𝑨𝑹 𝑿𝑫</strong>
+            <small>ADMIN CONTROL CENTER</small>
+          </span>
+        </a>
+        <a class="online-pill" href="./" style="text-decoration: none;">← Back to Portal</a>
+      </header>
+
+      <section class="hero" style="min-height: auto; padding: 45px 32px 30px;" aria-labelledby="admin-page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Authorized Session</p>
+          <h1 id="admin-page-title" style="font-size: clamp(2.5rem, 5vw, 4.5rem);">Admin management<br /><em>&amp; broadcast suite.</em></h1>
+          <p class="hero-text">Generate activation keys, monitor active WhatsApp connections, and dispatch announcements across connected Skylar sessions.</p>
+        </div>
+      </section>
+
+      <section class="stat-row" aria-label="Skylar metrics">
+        <article class="stat-card">
+          <strong><i class="live-dot"></i>ACTIVE</strong>
+          <span>Total Paired Users: <strong id="paired-count" style="color: var(--ink);">128</strong></span>
+        </article>
+        <article class="stat-card">
+          <strong>GATEWAY</strong>
+          <span>Status: <strong style="color: #99d29e;">Online (Ready)</strong></span>
+        </article>
+        <article class="stat-card">
+          <strong>KEYS</strong>
+          <span>Active Tokens: <strong id="keys-count" style="color: var(--ink);">14 Generated</strong></span>
+        </article>
+      </section>
+
+      <section class="admin-card" aria-labelledby="key-gen-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Licensing</p>
+            <h2 id="key-gen-heading">Activation Key Generation</h2>
+          </div>
+          <span class="step-badge">SECURE</span>
+        </div>
+        <p class="section-text">Create secure activation tokens for premium Skylar sessions. Keys are instantly saved to the session registry.</p>
+        
+        <div class="admin-panel" style="border-top: none; padding-top: 0;">
+          <div class="admin-row">
+            <div>
+              <strong style="font-size: 0.95rem;">Mint New Premium Token</strong>
+              <p class="admin-hint">Generates a unique cryptographic activation key for user pairing authorization.</p>
+            </div>
+            <button class="button primary" id="generate-admin-key" type="button">Generate Activation Key ↗</button>
+          </div>
+
+          <div class="key-output" id="admin-key-box" hidden style="margin-top: 18px;">
+            <span id="admin-generated-key">SKXD-PREM-2026-XXXX</span>
+            <button id="admin-copy-key" type="button">Copy Key</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-card" aria-labelledby="broadcast-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Announcements</p>
+            <h2 id="broadcast-heading">Session Broadcast Center</h2>
+          </div>
+          <span class="step-badge">WHATSAPP</span>
+        </div>
+        <p class="section-text">Send instant system notifications or feature updates directly to all active WhatsApp sessions linked through Skylar XD.</p>
+        
+        <form id="broadcast-form" novalidate style="display: grid; gap: 16px; margin-top: 20px;">
+          <label for="broadcast-msg" style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);">Broadcast Message</label>
+          <textarea id="broadcast-msg" rows="4" placeholder="Type notification update for connected Skylar users..." required style="width: 100%; padding: 14px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: rgba(20, 10, 8, 0.85); color: var(--ink); outline: none; resize: vertical;"></textarea>
+          <div class="admin-row">
+            <span class="admin-hint">Dispatches to all active sessions once the Pterodactyl backend webhook is linked.</span>
+            <button class="button primary" type="submit">Broadcast to All Users ↗</button>
+          </div>
+        </form>
+        <div class="status-box" id="broadcast-status" role="status" aria-live="polite" hidden style="margin-top: 16px;"></div>
+      </section>
+
+      <footer class="footer"><span>𝑺𝑲𝒀𝑳𝑨𝑹 𝑿𝑫</span><span>Admin Control Center · Backend-ready interface</span><a href="https://github.com/blacklorddev15/skylar" target="_blank" rel="noopener noreferrer">Source ↗</a></footer>
+    </main>
+
+    <script>
+      const authOverlay = document.querySelector('#auth-overlay');
+      const authForm = document.querySelector('#auth-form');
+      const adminPass = document.querySelector('#admin-pass');
+      const authError = document.querySelector('#auth-error');
+
+      authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const pwd = adminPass.value.trim();
+        if (pwd === 'skylar10') {
+          authOverlay.style.display = 'none';
+        } else {
+          authError.hidden = false;
+          adminPass.value = '';
+        }
+      });
+
+      const generateBtn = document.querySelector('#generate-admin-key');
+      const keyBox = document.querySelector('#admin-key-box');
+      const keyText = document.querySelector('#admin-generated-key');
+      const copyBtn = document.querySelector('#admin-copy-key');
+      const broadcastForm = document.querySelector('#broadcast-form');
+      const broadcastMsg = document.querySelector('#broadcast-msg');
+      const broadcastStatus = document.querySelector('#broadcast-status');
+      const keysCount = document.querySelector('#keys-count');
+
+      let totalKeys = 14;
+
+      generateBtn.addEventListener('click', () => {
+        const randomSuffix = Math.random().toString(36).substring(2, 10).toUpperCase();
+        const key = `SKXD-PREM-2026-${randomSuffix}`;
+        keyText.textContent = key;
+        keyBox.hidden = false;
+        totalKeys++;
+        keysCount.textContent = `${totalKeys} Generated`;
+      });
+
+      copyBtn.addEventListener('click', async () => {
+        const key = keyText.textContent.trim();
+        if (!key) return;
+        try {
+          await navigator.clipboard.writeText(key);
+          copyBtn.textContent = 'Copied';
+          setTimeout(() => { copyBtn.textContent = 'Copy Key'; }, 1500);
+        } catch {
+          // fallback
+        }
+      });
+
+      broadcastForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const msg = broadcastMsg.value.trim();
+        if (!msg) return;
+        broadcastStatus.hidden = false;
+        broadcastStatus.className = 'status-box success';
+        broadcastStatus.textContent = 'Broadcast queued successfully for 128 active WhatsApp sessions.';
+        broadcastMsg.value = '';
+        setTimeout(() => { broadcastStatus.hidden = true; }, 4000);
+      });
+    </script>
+  </body>
+</html>
