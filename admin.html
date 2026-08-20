@@ -198,6 +198,17 @@
             <button class="button mode-btn active" id="licensing-free-btn" type="button" style="justify-content: center; background: rgba(243, 180, 134, 0.15); border-color: var(--accent-strong);">Free Mode (No Key)</button>
             <button class="button mode-btn ghost" id="licensing-prem-btn" type="button" style="justify-content: center;">Premium Mode (Key Required)</button>
           </div>
+
+          <div style="margin-top: 24px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(30, 17, 14, 0.7);">
+            <strong style="color: var(--accent-strong); font-size: 0.9rem; display: block; margin-bottom: 6px;">How Premium Mode Connects & Works:</strong>
+            <p class="admin-hint" style="line-height: 1.6;">
+              1. <strong>Switch to Premium Mode</strong> above.<br/>
+              2. The public pairing portal (`index.html`) instantly detects the mode and reveals the <strong>Activation Key input field</strong>.<br/>
+              3. Administrators generate and distribute cryptographic keys (e.g., <code>SKXD-PREM-2026-XXXX</code>) from the <strong>Key Management</strong> panel below.<br/>
+              4. When a user submits their phone number and key, the backend verifies the key's validity, checks expiry/device limits, and grants WhatsApp pairing authorization.
+            </p>
+          </div>
+
         </section>
 
         <section class="admin-card">
