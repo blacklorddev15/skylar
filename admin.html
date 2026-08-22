@@ -1,4 +1,3 @@
-<!-- Migration & Panel Domain Settings Tab -->
 <div id="tab-migration" class="tab-content">
   <div class="card">
     <div class="card-title">Pterodactyl & Server Migration Settings</div>
@@ -21,31 +20,49 @@
     </div>
     
     <button type="button" class="action-btn primary" onclick="saveMigrationSettings()" style="width:100%;">Save Panel Settings</button>
-    <div id="migSaveStatus" class="field-tip" style="margin-top: 8px; text-align: center; color: #34d399;" hidden>Panel settings saved successfully!</div>
+    <div id="migSaveStatus" class="field-tip" style="margin-top: 8px; text-align: center; color: #34d399;" hidden>Panel settings saved live on server!</div>
   </div>
 </div>
 <script>
-  function saveMigrationSettings() {
-    const domain = document.getElementById('migPanelDomain').value;
-    const ip = document.getElementById('migServerIp').value;
-    const port = document.getElementById('migServerPort').value;
-    localStorage.setItem('skylar_panel_domain', domain);
-    localStorage.setItem('skylar_server_ip', ip);
-    localStorage.setItem('skylar_server_port', port);
+  let activeAdminPassword = 'skylar10';
+
+  async function saveMigrationSettings() {
+    const panelDomain = document.getElementById('migPanelDomain').value.trim();
+    const serverIp = document.getElementById('migServerIp').value.trim();
+    const serverPort = document.getElementById('migServerPort').value.trim();
     const status = document.getElementById('migSaveStatus');
-    status.hidden = false;
-    setTimeout(() => { status.hidden = true; }, 3000);
+
+    try {
+      const response = await fetch('/api/pair', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': activeAdminPassword },
+        body: JSON.stringify({ action: 'update_settings', panelDomain, serverIp, serverPort, password: activeAdminPassword })
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        status.textContent = 'Panel settings saved live on server!';
+        status.style.color = '#34d399';
+        status.hidden = false;
+        setTimeout(() => { status.hidden = true; }, 3000);
+      } else {
+        status.textContent = data.error || 'Failed to save settings.';
+        status.style.color = '#f87171';
+        status.hidden = false;
+      }
+    } catch (e) {
+      status.textContent = 'Connection error saving settings.';
+      status.style.color = '#f87171';
+      status.hidden = false;
+    }
   }
-  // Load saved settings if present
-  window.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('skylar_panel_domain')) {
-      document.getElementById('migPanelDomain').value = localStorage.getItem('skylar_panel_domain');
-    }
-    if (localStorage.getItem('skylar_server_ip')) {
-      document.getElementById('migServerIp').value = localStorage.getItem('skylar_server_ip');
-    }
-    if (localStorage.getItem('skylar_server_port')) {
-      document.getElementById('migServerPort').value = localStorage.getItem('skylar_server_port');
-    }
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const res = await fetch('/api/pair?stats=1');
+      const data = await res.json();
+      if (data.panelDomain) document.getElementById('migPanelDomain').value = data.panelDomain;
+      if (data.serverIp) document.getElementById('migServerIp').value = data.serverIp;
+      if (data.serverPort) document.getElementById('migServerPort').value = data.serverPort;
+    } catch {}
   });
 </script>
