@@ -1,379 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skylar XD - Admin Command Center</title>
-  <link rel="stylesheet" href="./styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* Phone-sized shell container matching landing page proportions */
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background: #09090b;
-      margin: 0;
-      padding: 12px;
-      box-sizing: border-box;
-    }
-    .admin-shell {
-      width: 100%;
-      max-width: 440px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-      overflow-y: auto;
-      max-height: 92vh;
-      padding: 16px;
-      box-sizing: border-box;
-    }
-    .admin-shell::-webkit-scrollbar {
-      width: 4px;
-    }
-    .admin-shell::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 4px;
-    }
-    .login-container {
-      margin: 20px auto;
-      max-width: 100%;
-    }
-    .admin-tabs {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      margin-bottom: 16px;
-    }
-    .admin-tabs::-webkit-scrollbar {
-      height: 3px;
-    }
-    .admin-tabs::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 2px;
-    }
-    .tab-btn {
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface);
-      color: var(--text-muted);
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 160ms ease;
-    }
-    .tab-btn:hover, .tab-btn.active {
-      border-color: rgba(251, 191, 36, 0.7);
-      background: rgba(251, 191, 36, 0.15);
-      color: #fde68a;
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: grid;
-      gap: 16px;
-    }
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .metric-card {
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface);
-      display: grid;
-      gap: 4px;
-    }
-    .metric-card span {
-      font-size: 0.58rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-soft);
-    }
-    .metric-card strong {
-      font-family: "Playfair Display", serif;
-      font-size: 1.25rem;
-      font-style: italic;
-      color: var(--text);
-    }
-    .table-wrap {
-      width: 100%;
-      overflow-x: auto;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 0.75rem;
-    }
-    th, td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text-muted);
-      white-space: nowrap;
-    }
-    th {
-      color: var(--accent);
-      font-size: 0.62rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      background: rgba(251, 191, 36, 0.05);
-    }
-    tr:last-child td {
-      border-bottom: none;
-    }
-  </style>
-</head>
-<body>
-  <div class="admin-shell">
-    <header class="topbar">
-      <a href="./index.html" class="back-button" title="Back to Portal"><span>←</span></a>
-      <div class="topbar-title">
-        <small>MOBILE ADMIN</small>
-        <strong>Skylar XD</strong>
+<!-- Migration & Panel Domain Settings Tab -->
+<div id="tab-migration" class="tab-content">
+  <div class="card">
+    <div class="card-title">Pterodactyl & Server Migration Settings</div>
+    <p class="field-tip" style="margin-bottom: 14px;">Update your panel domain, server IP, or allocation port here when changing servers. Changes take effect instantly without touching Vercel!</p>
+    
+    <div class="form-group" style="margin-bottom: 12px;">
+      <label for="migPanelDomain">PTERODACTYL PANEL DOMAIN</label>
+      <input type="text" id="migPanelDomain" value="https://pterodactyl.mzazi.shop" style="width:100%; padding:10px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:monospace; font-size:0.8rem;">
+    </div>
+    
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+      <div class="form-group">
+        <label for="migServerIp">SERVER IP / HOST</label>
+        <input type="text" id="migServerIp" value="139.59.111.210" style="width:100%; padding:10px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:monospace; font-size:0.8rem;">
       </div>
-      <a href="./index.html" class="admin-icon-btn" title="Portal"><span>🏠</span></a>
-    </header>
-
-    <main class="main-content">
-      <div id="loginCard" class="admin-card login-container">
-        <h2>Admin Login</h2>
-        <p class="section-text">Enter passcode (skylar10) to access management console.</p>
-        <form onsubmit="handleAdminLogin(event)">
-          <div class="form-group">
-            <label for="adminPass">Secure Passcode</label>
-            <input type="password" id="adminPass" placeholder="Enter passcode" required autocomplete="current-password">
-          </div>
-          <button type="submit" class="submit-btn">Unlock Console</button>
-        </form>
-        <div id="loginError" class="status-box error hidden" style="margin-top: 12px;">Incorrect passcode. Try skylar10.</div>
+      <div class="form-group">
+        <label for="migServerPort">ALLOCATION PORT</label>
+        <input type="text" id="migServerPort" value="25572" style="width:100%; padding:10px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:monospace; font-size:0.8rem;">
       </div>
-
-      <div id="dashboardContent" class="hidden">
-        <div class="admin-tabs">
-          <button type="button" class="tab-btn active" onclick="switchTab(event, 'overviewTab')">Overview</button>
-          <button type="button" class="tab-btn" onclick="switchTab(event, 'licensingTab')">Licensing</button>
-          <button type="button" class="tab-btn" onclick="switchTab(event, 'usersTab')">Users</button>
-          <button type="button" class="tab-btn" onclick="switchTab(event, 'healthTab')">Health</button>
-          <button type="button" class="tab-btn" onclick="switchTab(event, 'broadcastTab')">Broadcast</button>
-        </div>
-
-        <!-- OVERVIEW TAB -->
-        <div id="overviewTab" class="tab-content active">
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <span>Sessions</span>
-              <strong>128</strong>
-            </div>
-            <div class="metric-card">
-              <span>Mode</span>
-              <strong style="color: #4ade80; font-size: 1rem;">Free Mode</strong>
-            </div>
-            <div class="metric-card">
-              <span>Pterodactyl</span>
-              <strong style="color: var(--accent); font-size: 1rem;">Online</strong>
-            </div>
-            <div class="metric-card">
-              <span>Keys</span>
-              <strong>24 Minted</strong>
-            </div>
-          </div>
-
-          <section class="admin-card">
-            <h2>Quick Actions</h2>
-            <p class="section-text">Manage runtime state and maintenance mode.</p>
-            <div style="display: grid; gap: 8px; margin-top: 12px;">
-              <button type="button" class="submit-btn" style="padding: 10px; background: rgba(34, 197, 94, 0.2); color: #4ade80;" onclick="alert('Bot runtime synchronized!')">Sync Bot Runtime</button>
-              <button type="button" class="submit-btn" style="padding: 10px; background: rgba(239, 68, 68, 0.2); color: #f87171;" onclick="alert('Maintenance mode toggled!')">Toggle Maintenance</button>
-            </div>
-          </section>
-        </div>
-
-        <!-- LICENSING TAB -->
-        <div id="licensingTab" class="tab-content">
-          <section class="admin-card">
-            <div class="section-heading">
-              <h2>Gateway Policy</h2>
-              <span class="instance-pill">ACTIVE</span>
-            </div>
-            <p class="section-text">Switch public pairing requirement mode.</p>
-            <div class="mode-toggle-group">
-              <button type="button" class="mode-btn active" id="freeModeBtn" onclick="setMode('free')">
-                <strong>Free</strong>
-                <small>No key needed</small>
-              </button>
-              <button type="button" class="mode-btn" id="premModeBtn" onclick="setMode('premium')">
-                <strong>Premium</strong>
-                <small>Key required</small>
-              </button>
-            </div>
-          </section>
-
-          <section class="admin-card">
-            <h2>Key Generator</h2>
-            <p class="section-text">Mint cryptographic activation tokens.</p>
-            <button type="button" class="submit-btn" onclick="generateKey()">Generate Key</button>
-            <div id="generatedKeyWrap" class="hidden" style="margin-top: 12px;">
-              <div class="key-output">
-                <span id="keyValue" style="font-size: 0.78rem;">TOKEN-PREM-2026-XXXX</span>
-                <button type="button" class="copy-btn" onclick="copyKey()">Copy</button>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <!-- USERS TAB -->
-        <div id="usersTab" class="tab-content">
-          <section class="admin-card">
-            <h2>Active Users</h2>
-            <p class="section-text">Connected WhatsApp sessions.</p>
-            <div class="table-wrap" style="margin-top: 12px;">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Phone</th>
-                    <th>Tier</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>+254 712 345</td>
-                    <td><span style="color: var(--accent);">Prem</span></td>
-                    <td><span style="color: #4ade80;">● Active</span></td>
-                  </tr>
-                  <tr>
-                    <td>+254 798 123</td>
-                    <td>Free</td>
-                    <td><span style="color: #4ade80;">● Active</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </div>
-
-        <!-- HEALTH TAB -->
-        <div id="healthTab" class="tab-content">
-          <section class="admin-card">
-            <h2>Container Telemetry</h2>
-            <p class="section-text">Server load and logs.</p>
-            <div class="stat-grid" style="margin-top: 12px;">
-              <div class="stat-box">
-                <span class="stat-lbl">CPU</span>
-                <strong>1.4%</strong>
-              </div>
-              <div class="stat-box">
-                <span class="stat-lbl">RAM</span>
-                <strong>184M</strong>
-              </div>
-            </div>
-            <div style="display: grid; gap: 8px; margin-top: 14px;">
-              <button type="button" class="submit-btn" style="padding: 10px; background: rgba(251, 191, 36, 0.2); color: #fde68a;" onclick="alert('Restart command sent!')">Restart Bot</button>
-              <button type="button" class="submit-btn" style="padding: 10px; background: rgba(56, 189, 248, 0.2); color: #38bdf8;" onclick="alert('Logs downloaded!')">Get Logs</button>
-            </div>
-          </section>
-        </div>
-
-        <!-- BROADCAST TAB -->
-        <div id="broadcastTab" class="tab-content">
-          <section class="admin-card">
-            <h2>Broadcast</h2>
-            <p class="section-text">Send announcement to sessions.</p>
-            <form onsubmit="handleBroadcast(event)">
-              <div class="form-group">
-                <label for="broadcastMsg">Message</label>
-                <textarea id="broadcastMsg" rows="3" placeholder="Type broadcast..." style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); color: var(--text); font-family: inherit; resize: vertical;" required></textarea>
-              </div>
-              <button type="submit" class="submit-btn">Broadcast Now</button>
-            </form>
-            <div id="broadcastSuccess" class="status-box success hidden" style="margin-top: 10px;">Broadcast sent successfully!</div>
-          </section>
-        </div>
-      </div>
-    </main>
-
-    <footer class="footer">
-      <span>Skylar XD Enterprise</span>
-      <a href="./index.html">Portal</a>
-    </footer>
+    </div>
+    
+    <button type="button" class="action-btn primary" onclick="saveMigrationSettings()" style="width:100%;">Save Panel Settings</button>
+    <div id="migSaveStatus" class="field-tip" style="margin-top: 8px; text-align: center; color: #34d399;" hidden>Panel settings saved successfully!</div>
   </div>
-
-  <script>
-    function handleAdminLogin(event) {
-      event.preventDefault();
-      const pass = document.getElementById('adminPass').value.trim();
-      const errBox = document.getElementById('loginError');
-      const loginCard = document.getElementById('loginCard');
-      const dashboard = document.getElementById('dashboardContent');
-
-      if (pass === 'skylar10') {
-        loginCard.classList.add('hidden');
-        dashboard.classList.remove('hidden');
-      } else {
-        errBox.classList.remove('hidden');
-      }
+</div>
+<script>
+  function saveMigrationSettings() {
+    const domain = document.getElementById('migPanelDomain').value;
+    const ip = document.getElementById('migServerIp').value;
+    const port = document.getElementById('migServerPort').value;
+    localStorage.setItem('skylar_panel_domain', domain);
+    localStorage.setItem('skylar_server_ip', ip);
+    localStorage.setItem('skylar_server_port', port);
+    const status = document.getElementById('migSaveStatus');
+    status.hidden = false;
+    setTimeout(() => { status.hidden = true; }, 3000);
+  }
+  // Load saved settings if present
+  window.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('skylar_panel_domain')) {
+      document.getElementById('migPanelDomain').value = localStorage.getItem('skylar_panel_domain');
     }
-
-    function switchTab(event, tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      event.currentTarget.classList.add('active');
+    if (localStorage.getItem('skylar_server_ip')) {
+      document.getElementById('migServerIp').value = localStorage.getItem('skylar_server_ip');
     }
-
-    function setMode(mode) {
-      const freeBtn = document.getElementById('freeModeBtn');
-      const premBtn = document.getElementById('premModeBtn');
-      if (mode === 'free') {
-        freeBtn.classList.add('active');
-        premBtn.classList.remove('active');
-        alert('Gateway policy updated to Free Mode.');
-      } else {
-        premBtn.classList.add('active');
-        freeBtn.classList.remove('active');
-        alert('Gateway policy updated to Premium Mode.');
-      }
+    if (localStorage.getItem('skylar_server_port')) {
+      document.getElementById('migServerPort').value = localStorage.getItem('skylar_server_port');
     }
-
-    function generateKey() {
-      const wrap = document.getElementById('generatedKeyWrap');
-      const val = document.getElementById('keyValue');
-      const randomKey = 'TOKEN-PREM-2026-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-      val.textContent = randomKey;
-      wrap.classList.remove('hidden');
-    }
-
-    function copyKey() {
-      const key = document.getElementById('keyValue').textContent;
-      navigator.clipboard.writeText(key).then(() => {
-        alert('Activation key copied: ' + key);
-      });
-    }
-
-    function handleBroadcast(event) {
-      event.preventDefault();
-      const successBox = document.getElementById('broadcastSuccess');
-      successBox.classList.remove('hidden');
-      setTimeout(() => successBox.classList.add('hidden'), 3000);
-      event.target.reset();
-    }
-  </script>
-</body>
-</html>
+  });
+</script>
