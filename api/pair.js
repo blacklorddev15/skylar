@@ -113,7 +113,7 @@ export default async function handler(req, res) {
   const timeout = setTimeout(() => controller.abort(), 30000);
 
   try {
-    const upstream = await fetch(`${backendUrl}/api/pair`, {
+    const upstream = await fetch(`${backendUrl}/api/connect`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
