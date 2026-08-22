@@ -172,6 +172,7 @@
           <button type="button" class="tab-btn" onclick="switchTab(event, 'usersTab')">Users</button>
           <button type="button" class="tab-btn" onclick="switchTab(event, 'healthTab')">Health</button>
           <button type="button" class="tab-btn" onclick="switchTab(event, 'broadcastTab')">Broadcast</button>
+          <button type="button" class="tab-btn" onclick="switchTab(event, 'migrationTab')">Migration</button>
         </div>
 
         <!-- OVERVIEW TAB -->
@@ -305,7 +306,37 @@
             </form>
             <div id="broadcastSuccess" class="status-box success hidden" style="margin-top: 10px;">Broadcast sent successfully!</div>
           </section>
-        </div>
+
+        <!-- MIGRATION TAB -->
+        <div id="migrationTab" class="tab-content">
+          <section class="admin-card">
+            <h2>Pterodactyl & Server Migration</h2>
+            <p class="section-text">If you move to another Pterodactyl panel, update these details here. The website admin login remains available while the bot is offline.</p>
+            <div class="form-group">
+              <label for="migPanelDomain">Pterodactyl Panel Domain</label>
+              <input type="url" id="migPanelDomain" value="https://pterodactyl.mzazi.shop" placeholder="https://panel.example.com">
+            </div>
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
+              <div class="form-group"><label for="migServerIp">Server IP / Host</label><input type="text" id="migServerIp" value="139.59.111.210" placeholder="139.59.111.210"></div>
+              <div class="form-group"><label for="migServerPort">Allocation Port</label><input type="text" id="migServerPort" value="25566" inputmode="numeric" placeholder="25572"></div>
+            </div>
+            <div class="form-group">
+              <label for="migServerId">Pterodactyl Server ID</label>
+              <input type="text" id="migServerId" value="" placeholder="Paste the server identifier from Pterodactyl">
+            </div>
+            <div class="form-group">
+              <label for="migBackendSecret">Backend API Secret</label>
+              <input type="password" id="migBackendSecret" value="" placeholder="Leave blank to keep the saved secret" autocomplete="new-password">
+              <small class="section-text" id="migSecretState" style="display:block; margin-top:5px;">Hidden until changed. It is never displayed in the response.</small>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+              <button type="button" class="submit-btn" onclick="saveMigrationSettings()">Save Pterodactyl Details</button>
+              <button type="button" class="submit-btn" onclick="testMigrationConnection()" style="background:rgba(56,189,248,.18); color:#38bdf8;">Test Connection</button>
+            </div>
+            <div id="migSaveStatus" class="status-box success hidden" style="margin-top:10px;">Ready</div>
+            <div id="migConnectionStatus" class="status-box hidden" style="margin-top:8px;">Not tested</div>
+          </section>
+        </div>        </div>
       </div>
     </main>
 
@@ -316,6 +347,8 @@
   </div>
 
   <script>
+    let activeAdminPassword = '';
+
     async function handleAdminLogin(event) {
       event.preventDefault();
       const pass = document.getElementById('adminPass').value.trim();
@@ -324,7 +357,7 @@
       const dashboard = document.getElementById('dashboardContent');
       errBox.classList.add('hidden');
       try {
-        const response = await fetch('/api/connect', {
+        const response = await fetch('/api/pair', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify({ action: 'login', password: pass }),
@@ -333,6 +366,8 @@
         if (!response.ok || data.success !== true) throw new Error(data.error || 'Incorrect admin password.');
         loginCard.classList.add('hidden');
         dashboard.classList.remove('hidden');
+        activeAdminPassword = pass;
+        populateMigrationSettings(data.config || {});
       } catch (error) {
         errBox.textContent = error.message || 'Website admin authentication is unavailable.';
         errBox.classList.remove('hidden');
@@ -382,6 +417,54 @@
       setTimeout(() => successBox.classList.add('hidden'), 3000);
       event.target.reset();
     }
+
+    function populateMigrationSettings(config) {
+      if (!config) return;
+      const values = { migPanelDomain: config.panelDomain, migServerIp: config.serverIp, migServerPort: config.serverPort, migServerId: config.serverId };
+      Object.entries(values).forEach(([id, value]) => { if (value !== undefined && value !== null) document.getElementById(id).value = value; });
+      const state = document.getElementById('migSecretState');
+      if (state && config.backendSecretMasked) state.textContent = config.backendSecretConfigured ? `Saved secret: ${config.backendSecretMasked} (hidden)` : 'No backend secret configured.';
+    }
+
+    function showMigrationStatus(id, message, isError = false) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = message;
+      el.classList.toggle('error', isError);
+      el.classList.remove('hidden');
+    }
+
+    async function saveMigrationSettings() {
+      const payload = {
+        action: 'update_settings',
+        panelDomain: document.getElementById('migPanelDomain').value.trim(),
+        serverIp: document.getElementById('migServerIp').value.trim(),
+        serverPort: document.getElementById('migServerPort').value.trim(),
+        serverId: document.getElementById('migServerId').value.trim(),
+      };
+      const secret = document.getElementById('migBackendSecret').value.trim();
+      if (secret) payload.backendSecret = secret;
+      try {
+        const res = await fetch('/api/pair', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Admin-Password': activeAdminPassword }, body: JSON.stringify(payload) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Settings update was rejected.');
+        document.getElementById('migBackendSecret').value = '';
+        populateMigrationSettings(data.config || {});
+        localStorage.setItem('pterodactyl_migration_details', JSON.stringify({ panelDomain: payload.panelDomain, serverIp: payload.serverIp, serverPort: payload.serverPort, serverId: payload.serverId }));
+        showMigrationStatus('migSaveStatus', 'Pterodactyl details saved. No public website code edit is required.');
+      } catch (error) { showMigrationStatus('migSaveStatus', error.message || 'Unable to save Pterodactyl details.', true); }
+    }
+
+    async function testMigrationConnection() {
+      showMigrationStatus('migConnectionStatus', 'Testing backend connection…');
+      try {
+        const res = await fetch('/api/pair', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Admin-Password': activeAdminPassword }, body: JSON.stringify({ action: 'test_connection' }) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Connection test was rejected.');
+        showMigrationStatus('migConnectionStatus', data.backendOnline ? 'ONLINE — backend is reachable.' : `OFFLINE — ${data.message || 'backend is not reachable.'}`, !data.backendOnline);
+      } catch (error) { showMigrationStatus('migConnectionStatus', error.message || 'Connection test failed.', true); }
+    }
+
   </script>
 </body>
 </html>
