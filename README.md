@@ -4,18 +4,18 @@ A responsive public pairing portal for Skylar XD. The landing page follows a war
 
 ## Pairing endpoint
 
-The browser posts to `/api/pairing` with the following JSON payload:
+The browser posts to `/api/pair` with the following JSON payload:
 
 ```json
 { "phone": "254712345678", "botType": "skylar" }
 ```
 
-The endpoint may respond immediately with `pairing_code`, `pairingCode`, or `code`, or it may return a request identifier such as `request_id`. For asynchronous responses, the browser polls `/api/pairing?requestId=...` until a code is available.
+The endpoint may respond immediately with `pairing_code`, `pairingCode`, or `code`, or it may return a request identifier such as `request_id`. For asynchronous responses, the browser polls `/api/pair?requestId=...` until a code is available. `/api/pairing` remains available as a compatibility alias.
 
 To use another endpoint without rebuilding the site, define `window.SKYLAR_PAIRING_ENDPOINT` before loading `script.js`:
 
 ```html
-<script>window.SKYLAR_PAIRING_ENDPOINT = 'https://your-pairing-service.example/api/pairing';</script>
+<script>window.SKYLAR_PAIRING_ENDPOINT = 'https://your-pairing-service.example/api/pair';</script>
 <script src="./script.js" defer></script>
 ```
 

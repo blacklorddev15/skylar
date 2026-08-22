@@ -127,7 +127,7 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', upstream.headers.get('content-type') || 'application/json');
     return res.status(upstream.status).send(upstreamBody);
   } catch {
-    return res.status(502).json({ error: 'Skylar backend is unreachable. Check the server IP, allocation port, and that the backend is running.' });
+    return res.status(502).json({ error: 'Skylar backend is offline. Please start the bot server on your Pterodactyl panel.' });
   } finally {
     clearTimeout(timeout);
   }

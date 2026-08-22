@@ -1,4 +1,4 @@
-const PAIRING_ENDPOINT = window.SKYLAR_PAIRING_ENDPOINT || '/api/pairing';
+const PAIRING_ENDPOINT = window.SKYLAR_PAIRING_ENDPOINT || '/api/pair';
 const TELEGRAM_URL = 'https://t.me/blacklordProjects_bot?start=skylar';
 
 const form = document.querySelector('#pair-form');
