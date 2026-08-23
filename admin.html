@@ -22,7 +22,7 @@
     }
     .admin-shell {
       width: 100%;
-      max-width: 440px;
+      max-width: 480px;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 28px;
@@ -83,6 +83,60 @@
     .tab-content.active {
       display: grid;
       gap: 16px;
+    }
+
+    /* Full-width phone layout: no miniature desktop card on narrow screens. */
+    @media (max-width: 600px) {
+      body {
+        align-items: stretch;
+        min-height: 100dvh;
+        padding: 6px;
+      }
+      .admin-shell {
+        width: 100%;
+        max-width: none;
+        min-height: calc(100dvh - 12px);
+        max-height: none;
+        padding: 10px;
+        border-radius: 18px;
+      }
+      .topbar {
+        padding: 10px 12px;
+        margin-bottom: 16px;
+      }
+      .main-content {
+        gap: 14px;
+      }
+      .admin-card {
+        padding: 16px;
+      }
+      .admin-tabs {
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .tab-btn {
+        flex: 1 1 calc(33.333% - 6px);
+        min-width: 0;
+        padding: 10px 7px;
+        font-size: 0.62rem;
+        letter-spacing: 0.05em;
+      }
+      .tab-content.active {
+        gap: 12px;
+      }
+      #migrationTab .admin-card > div[style*="grid-template-columns: 2fr 1fr"],
+      #migrationTab .admin-card > div[style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+      input, textarea, button {
+        max-width: 100%;
+      }
+    }
+
+    @media (min-width: 601px) {
+      .admin-shell {
+        max-width: 680px;
+      }
     }
     .metrics-grid {
       display: grid;
@@ -339,7 +393,6 @@
             <div id="migConnectionStatus" class="status-box hidden" style="margin-top:8px;">Not tested</div>
           </section>
         </div>        </div>
-      </div>
     </main>
 
     <footer class="footer">
@@ -383,17 +436,32 @@
       event.currentTarget.classList.add('active');
     }
 
-    function setMode(mode) {
+    async function setMode(mode) {
       const freeBtn = document.getElementById('freeModeBtn');
       const premBtn = document.getElementById('premModeBtn');
-      if (mode === 'free') {
-        freeBtn.classList.add('active');
-        premBtn.classList.remove('active');
-        alert('Gateway policy updated to Free Mode.');
-      } else {
-        premBtn.classList.add('active');
-        freeBtn.classList.remove('active');
-        alert('Gateway policy updated to Premium Mode.');
+      const premiumMode = mode === 'premium';
+      if (!activeAdminPassword) {
+        alert('Please unlock the admin console first.');
+        return;
+      }
+      freeBtn.disabled = true;
+      premBtn.disabled = true;
+      try {
+        const response = await fetch('/api/pair', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Password': activeAdminPassword },
+          body: JSON.stringify({ action: 'update_settings', premiumMode }),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || 'Unable to update gateway policy.');
+        freeBtn.classList.toggle('active', !premiumMode);
+        premBtn.classList.toggle('active', premiumMode);
+        alert(premiumMode ? 'Gateway policy updated to Premium Mode.' : 'Gateway policy updated to Free Mode. No activation key is required.');
+      } catch (error) {
+        alert(error.message || 'Unable to update gateway policy.');
+      } finally {
+        freeBtn.disabled = false;
+        premBtn.disabled = false;
       }
     }
 

@@ -1,14 +1,14 @@
 const PAIRING_ENDPOINT = window.SKYLAR_PAIRING_ENDPOINT || '/api/pair';
 const TELEGRAM_URL = 'https://t.me/blacklordProjects_bot?start=skylar';
 
-const form = document.querySelector('#pair-form');
-const phoneInput = document.querySelector('#phone');
-const submitButton = document.querySelector('#submit-button');
-const statusBox = document.querySelector('#status-box');
-const codeBox = document.querySelector('#code-box');
-const codeValue = document.querySelector('#code-value');
-const copyCodeButton = document.querySelector('#copy-code');
-const fallbackBox = document.querySelector('#fallback-box');
+const form = document.querySelector('#pairForm') || document.querySelector('#pair-form');
+const phoneInput = document.querySelector('#phoneNumber') || document.querySelector('#phone');
+const submitButton = document.querySelector('#submitBtn') || document.querySelector('#submit-button');
+const statusBox = document.querySelector('#statusBox') || document.querySelector('#status-box');
+const codeBox = document.querySelector('#codeResultBox') || document.querySelector('#code-box');
+const codeValue = document.querySelector('#pairingCodeDisplay') || document.querySelector('#code-value');
+const copyCodeButton = document.querySelector('#copyCode') || document.querySelector('#copy-code') || document.querySelector('.copy-btn');
+const fallbackBox = document.querySelector('#fallbackBox') || document.querySelector('#fallback-box') || document.querySelector('.telegram-fallback');
 let pollTimer;
 let currentRequestId;
 
@@ -19,8 +19,11 @@ function setStatus(message, tone = '') {
 }
 
 function setBusy(busy) {
+  if (!submitButton) return;
   submitButton.disabled = busy;
-  submitButton.querySelector('span:first-child').textContent = busy ? 'Requesting code…' : 'Generate pairing code';
+  const label = submitButton.querySelector('span:first-child');
+  if (label) label.textContent = busy ? 'Requesting code…' : 'Generate pairing code';
+  else submitButton.textContent = busy ? 'Requesting code…' : 'Generate Pairing Code';
 }
 
 function normalizePhone(value) {
@@ -36,6 +39,7 @@ function showFallback() {
 function showCode(code) {
   codeValue.textContent = String(code).replace(/\s+/g, '').toUpperCase();
   codeBox.hidden = false;
+  codeBox.classList.remove('hidden');
   setStatus('Pairing code generated successfully. It is ready to use in WhatsApp.', 'success');
   clearInterval(pollTimer);
   setBusy(false);
@@ -77,10 +81,25 @@ async function pollPairing(requestId) {
 const activationKeyInput = document.querySelector('#activation-key');
 const activationKeyGroup = document.querySelector('#activation-key-group');
 
-// Check localStorage for admin licensing mode
+// Use localStorage only as an immediate fallback; the pairing bridge is authoritative.
 let isPremium = localStorage.getItem('skylar_mode') === 'premium';
 
+async function syncServerMode() {
+  try {
+    const response = await fetch(`${PAIRING_ENDPOINT}?stats=1`, { headers: { Accept: 'application/json' } });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok && typeof data.premiumMode === 'boolean') {
+      isPremium = data.premiumMode;
+      localStorage.setItem('skylar_mode', isPremium ? 'premium' : 'free');
+      syncPublicMode();
+    }
+  } catch (error) {
+    console.warn('Could not synchronize Skylar licensing mode:', error);
+  }
+}
+
 function syncPublicMode() {
+  if (!activationKeyGroup) return;
   if (isPremium) {
     activationKeyGroup.hidden = false;
   } else {
@@ -89,6 +108,7 @@ function syncPublicMode() {
 }
 
 syncPublicMode();
+syncServerMode();
 window.addEventListener('storage', () => {
   isPremium = localStorage.getItem('skylar_mode') === 'premium';
   syncPublicMode();
@@ -186,10 +206,10 @@ function updateLicensingMode(premium) {
   keyOutputBox.hidden = true;
 }
 
-modeFreeBtn.addEventListener('click', () => updateLicensingMode(false));
-modePremiumBtn.addEventListener('click', () => updateLicensingMode(true));
+modeFreeBtn?.addEventListener('click', () => updateLicensingMode(false));
+modePremiumBtn?.addEventListener('click', () => updateLicensingMode(true));
 
-generateKeyBtn.addEventListener('click', () => {
+generateKeyBtn?.addEventListener('click', () => {
   const prefix = isPremiumMode ? 'SKXD-PREM-2026' : 'SKXD-FREE-2026';
   const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
   const key = `${prefix}-${randomSuffix}`;
@@ -197,7 +217,7 @@ generateKeyBtn.addEventListener('click', () => {
   keyOutputBox.hidden = false;
 });
 
-copyKeyBtn.addEventListener('click', async () => {
+copyKeyBtn?.addEventListener('click', async () => {
   const key = generatedKeyText.textContent.trim();
   if (!key) return;
   try {
