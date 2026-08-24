@@ -12,6 +12,24 @@ const runtimeConfig = {
 };
 
 const generatedKeys = new Set(['SKYLAR-PRO-2026']);
+const relayJobs = new Map();
+let activeBot = null;
+const RELAY_TTL_MS = 90_000;
+
+function relayAuthorized(req) {
+  const supplied = String(req.headers['x-bot-registration-secret'] || req.headers['x-api-secret'] || '').trim();
+  const expected = String(process.env.API_SECRET || runtimeConfig.backendSecret || runtimeConfig.adminPassword || '').trim();
+  return Boolean(expected && supplied === expected);
+}
+
+function activeBotIsOnline() {
+  return Boolean(activeBot && Date.now() - activeBot.lastSeen < RELAY_TTL_MS);
+}
+
+function pruneRelayJobs() {
+  const expiry = Date.now() - 120_000;
+  for (const [id, job] of relayJobs) if (job.updatedAt < expiry) relayJobs.delete(id);
+}
 
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -90,7 +108,7 @@ export default async function handler(req, res) {
     const health = await checkBackend();
     const uptimeSeconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
     return res.status(200).json({
-      status: health.online ? 'online' : 'offline',
+      status: activeBotIsOnline() ? 'online' : (health.online ? 'online' : 'offline'),
       uptime: `${Math.floor(uptimeSeconds / 3600)}h ${Math.floor((uptimeSeconds % 3600) / 60)}m ${uptimeSeconds % 60}s`,
       pairedCount: totalPairs,
       premiumMode: runtimeConfig.premiumMode,
@@ -98,11 +116,53 @@ export default async function handler(req, res) {
       serverIp: runtimeConfig.serverIp,
       serverPort: runtimeConfig.serverPort,
       serverId: runtimeConfig.serverId,
+      activeBot: activeBotIsOnline() ? { botId: activeBot.botId, bot: activeBot.bot, serverId: activeBot.serverId, port: activeBot.port, lastSeen: activeBot.lastSeen } : null,
     });
   }
 
   const body = req.method === 'POST' ? readBody(req) : (req.query || {});
   const action = body.action;
+  pruneRelayJobs();
+
+  if (req.method === 'POST' && action === 'register_bot') {
+    if (!relayAuthorized(req)) return res.status(401).json({ error: 'Unauthorized bot registration.' });
+    const botId = String(body.botId || body.serverId || '').trim();
+    if (!botId) return res.status(400).json({ error: 'botId is required.' });
+    activeBot = { botId, bot: String(body.bot || 'SKYLAR XD'), serverId: String(body.serverId || '').trim(), port: String(body.port || '').trim(), lastSeen: Date.now() };
+    return res.status(200).json({ success: true, registered: true, botId });
+  }
+
+  if (req.method === 'POST' && action === 'poll_job') {
+    if (!relayAuthorized(req)) return res.status(401).json({ error: 'Unauthorized bot poll.' });
+    if (activeBot && body.botId && String(body.botId) !== activeBot.botId) return res.status(409).json({ error: 'Another bot is currently registered.' });
+    if (activeBot) activeBot.lastSeen = Date.now();
+    const job = [...relayJobs.values()].find(item => item.status === 'pending' && item.botId === (activeBot?.botId || body.botId));
+    if (!job) return res.status(200).json({ success: true, job: null });
+    job.status = 'claimed';
+    job.updatedAt = Date.now();
+    return res.status(200).json({ success: true, job });
+  }
+
+  if (req.method === 'POST' && action === 'job_result') {
+    if (!relayAuthorized(req)) return res.status(401).json({ error: 'Unauthorized bot result.' });
+    const job = relayJobs.get(String(body.jobId || ''));
+    if (!job) return res.status(404).json({ error: 'Pairing job not found or expired.' });
+    job.status = String(body.status || 'failed');
+    job.code = body.code || body.rawCode || '';
+    job.rawCode = body.rawCode || body.code || '';
+    job.error = body.error || '';
+    job.updatedAt = Date.now();
+    if (activeBot) activeBot.lastSeen = Date.now();
+    return res.status(200).json({ success: true, jobId: job.id });
+  }
+
+  if (req.method === 'GET' && req.query?.requestId) {
+    const job = relayJobs.get(String(req.query.requestId));
+    if (!job) return res.status(404).json({ error: 'Pairing request not found or expired.' });
+    if (job.status === 'ready') return res.status(200).json({ success: true, pairing: { status: 'ready', code: job.code, rawCode: job.rawCode } });
+    if (job.status === 'failed') return res.status(502).json({ error: job.error || 'The Skylar bot failed to generate a pairing code.' });
+    return res.status(200).json({ success: true, pairing: { status: 'pending', requestId: job.id } });
+  }
 
   if (req.method === 'POST' && (action === 'admin_login' || action === 'login')) {
     const pass = String(body.password || '').trim();
@@ -145,6 +205,12 @@ export default async function handler(req, res) {
   const activationKey = String(body.activationKey || body.key || '').trim();
   if (runtimeConfig.premiumMode && (!activationKey || !generatedKeys.has(activationKey))) return res.status(403).json({ error: 'Premium mode is active. A valid activation key is required.' });
   if (phone.length < 7) return res.status(400).json({ error: 'Enter a valid international WhatsApp number.' });
+
+  if (activeBotIsOnline()) {
+    const id = `skylar-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    relayJobs.set(id, { id, phone, botId: activeBot.botId, status: 'pending', createdAt: Date.now(), updatedAt: Date.now() });
+    return res.status(202).json({ success: true, request_id: id, status: 'pending', message: 'Pairing request queued for the active Skylar bot.' });
+  }
 
   const base = getBackendBase();
   if (!base) return res.status(503).json({ error: 'Backend host/IP is not configured.' });
