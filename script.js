@@ -1,21 +1,40 @@
 const PAIRING_ENDPOINT = window.SKYLAR_PAIRING_ENDPOINT || '/api/pair';
 const TELEGRAM_URL = 'https://t.me/blacklordProjects_bot?start=skylar';
 
-const form = document.querySelector('#pairForm') || document.querySelector('#pair-form');
-const phoneInput = document.querySelector('#phoneNumber') || document.querySelector('#phone');
-const submitButton = document.querySelector('#submitBtn') || document.querySelector('#submit-button');
-const statusBox = document.querySelector('#statusBox') || document.querySelector('#status-box');
-const codeBox = document.querySelector('#codeResultBox') || document.querySelector('#code-box');
-const codeValue = document.querySelector('#pairingCodeDisplay') || document.querySelector('#code-value');
-const copyCodeButton = document.querySelector('#copyCode') || document.querySelector('#copy-code') || document.querySelector('.copy-btn');
-const fallbackBox = document.querySelector('#fallbackBox') || document.querySelector('#fallback-box') || document.querySelector('.telegram-fallback');
-let pollTimer;
-let currentRequestId;
+const form = document.querySelector('#pair-form, #pairForm');
+const phoneInput = document.querySelector('#phone, #phoneNumber');
+const submitButton = document.querySelector('#submit-button, #submitBtn');
+const statusBox = document.querySelector('#status-box, #statusBox');
+const codeBox = document.querySelector('#code-box, #codeResultBox');
+const codeValue = document.querySelector('#code-value, #pairingCodeDisplay');
+const copyCodeButton = document.querySelector('#copy-code');
+const fallbackBox = document.querySelector('#fallback-box');
+const readyFooter = document.querySelector('#readyFooterText');
+const activationKeyInput = document.querySelector('#activation-key');
+const activationKeyGroup = document.querySelector('#activation-key-group');
+
+let pollTimer = 0;
+let isPremium = window.localStorage?.getItem('skylar_mode') === 'premium';
+
+function reveal(element) {
+  if (!element) return;
+  element.hidden = false;
+  element.classList.remove('hidden');
+  element.style.removeProperty('display');
+}
+
+function conceal(element) {
+  if (!element) return;
+  element.hidden = true;
+  element.classList.add('hidden');
+}
 
 function setStatus(message, tone = '') {
-  statusBox.hidden = !message;
+  if (!statusBox) return;
+  statusBox.textContent = message || '';
   statusBox.className = `status-box${tone ? ` ${tone}` : ''}`;
-  statusBox.textContent = message;
+  if (message) reveal(statusBox);
+  else conceal(statusBox);
 }
 
 function setBusy(busy) {
@@ -23,33 +42,39 @@ function setBusy(busy) {
   submitButton.disabled = busy;
   const label = submitButton.querySelector('span:first-child');
   if (label) label.textContent = busy ? 'Requesting code…' : 'Generate pairing code';
-  else submitButton.textContent = busy ? 'Requesting code…' : 'Generate Pairing Code';
+  else if (!busy) submitButton.textContent = 'Generate Pairing Code';
 }
 
 function normalizePhone(value) {
-  return value.replace(/[^0-9]/g, '');
+  return String(value || '').replace(/[^0-9]/g, '');
 }
 
 function showFallback() {
-  fallbackBox.hidden = false;
+  if (!fallbackBox) return;
+  reveal(fallbackBox);
   const link = fallbackBox.querySelector('a');
   if (link) link.href = TELEGRAM_URL;
 }
 
 function showCode(code) {
+  if (!codeValue || !codeBox) {
+    showFailure('Pairing code received, but the page could not render it. Please refresh and try again.');
+    return;
+  }
   codeValue.textContent = String(code).replace(/\s+/g, '').toUpperCase();
-  codeBox.hidden = false;
-  codeBox.classList.remove('hidden');
+  reveal(codeBox);
   setStatus('Pairing code generated successfully. It is ready to use in WhatsApp.', 'success');
-  clearInterval(pollTimer);
+  if (readyFooter) readyFooter.textContent = 'Pairing code ready. Enter it in WhatsApp Linked Devices.';
+  window.clearInterval(pollTimer);
   setBusy(false);
 }
 
 function showFailure(message) {
-  setStatus(message, 'error');
+  setStatus(message || 'The pairing gateway is currently unavailable.', 'error');
+  if (readyFooter) readyFooter.textContent = 'Pairing is currently offline. Please try again later.';
   setBusy(false);
   showFallback();
-  clearInterval(pollTimer);
+  window.clearInterval(pollTimer);
 }
 
 async function readJson(response) {
@@ -60,75 +85,51 @@ async function readJson(response) {
 
 async function pollPairing(requestId) {
   try {
-    const response = await fetch(`${PAIRING_ENDPOINT}?requestId=${encodeURIComponent(requestId)}`, { headers: { Accept: 'application/json' } });
+    const response = await fetch(`${PAIRING_ENDPOINT}?requestId=${encodeURIComponent(requestId)}`, {
+      headers: { Accept: 'application/json' },
+    });
     const data = await readJson(response);
     const pairing = data.pairing || data;
-    if (pairing.pairing_code || pairing.pairingCode || pairing.code) {
-      showCode(pairing.pairing_code || pairing.pairingCode || pairing.code);
-      return;
+    const code = pairing.pairing_code || pairing.pairingCode || pairing.code;
+    if (code) {
+      showCode(code);
+      return true;
     }
     const state = String(pairing.status || '').toLowerCase();
     if (['failed', 'expired', 'cancelled', 'error'].includes(state)) {
       showFailure('WhatsApp could not complete this request. Please try again with the number in international format.');
-      return;
+      return true;
     }
     setStatus('Skylar is preparing your WhatsApp pairing code…');
   } catch (error) {
     console.warn('Pairing status request failed:', error);
   }
-}
-
-const activationKeyInput = document.querySelector('#activation-key');
-const activationKeyGroup = document.querySelector('#activation-key-group');
-
-// Use localStorage only as an immediate fallback; the pairing bridge is authoritative.
-let isPremium = localStorage.getItem('skylar_mode') === 'premium';
-
-async function syncServerMode() {
-  try {
-    const response = await fetch(`${PAIRING_ENDPOINT}?stats=1`, { headers: { Accept: 'application/json' } });
-    const data = await response.json().catch(() => ({}));
-    if (response.ok && typeof data.premiumMode === 'boolean') {
-      isPremium = data.premiumMode;
-      localStorage.setItem('skylar_mode', isPremium ? 'premium' : 'free');
-      syncPublicMode();
-    }
-  } catch (error) {
-    console.warn('Could not synchronize Skylar licensing mode:', error);
-  }
+  return false;
 }
 
 function syncPublicMode() {
-  if (!activationKeyGroup) return;
-  if (isPremium) {
-    activationKeyGroup.hidden = false;
-  } else {
-    activationKeyGroup.hidden = true;
+  if (activationKeyGroup) {
+    if (isPremium) reveal(activationKeyGroup);
+    else conceal(activationKeyGroup);
   }
 }
 
-syncPublicMode();
-syncServerMode();
-window.addEventListener('storage', () => {
-  isPremium = localStorage.getItem('skylar_mode') === 'premium';
-  syncPublicMode();
-});
+async function handlePairing(event) {
+  event?.preventDefault?.();
+  window.clearInterval(pollTimer);
+  conceal(codeBox);
+  conceal(fallbackBox);
 
-form.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  clearInterval(pollTimer);
-  codeBox.hidden = true;
-  fallbackBox.hidden = true;
-  const phone = normalizePhone(phoneInput.value);
+  const phone = normalizePhone(phoneInput?.value);
   if (phone.length < 8 || phone.length > 15) {
     setStatus('Enter a valid international number using 8–15 digits.', 'error');
-    return;
+    return false;
   }
 
-  const activationKey = activationKeyInput ? activationKeyInput.value.trim() : '';
+  const activationKey = activationKeyInput?.value.trim() || '';
   if (isPremium && !activationKey) {
     setStatus('Premium Mode requires a valid activation key.', 'error');
-    return;
+    return false;
   }
 
   setBusy(true);
@@ -141,37 +142,59 @@ form.addEventListener('submit', async (event) => {
     });
     const data = await readJson(response);
     const pairing = data.pairing || data;
-    if (pairing.pairing_code || pairing.pairingCode || pairing.code) {
-      showCode(pairing.pairing_code || pairing.pairingCode || pairing.code);
-      return;
+    const code = pairing.pairing_code || pairing.pairingCode || pairing.code;
+    if (code) {
+      showCode(code);
+      return false;
     }
-    currentRequestId = pairing.request_id || pairing.requestId || data.request_id || data.requestId;
-    if (!currentRequestId) throw new Error('The gateway accepted the request but did not return a tracking ID.');
+
+    const requestId = pairing.request_id || pairing.requestId || data.request_id || data.requestId;
+    if (!requestId) throw new Error('The gateway accepted the request but did not return a tracking ID.');
     setStatus('Request queued. Waiting for WhatsApp to prepare your code…');
-    pollTimer = window.setInterval(() => pollPairing(currentRequestId), 2200);
-    await pollPairing(currentRequestId);
+    await pollPairing(requestId);
+    pollTimer = window.setInterval(() => pollPairing(requestId), 2200);
   } catch (error) {
     showFailure(error.message || 'The pairing gateway is currently unavailable.');
   }
-});
+  return false;
+}
 
-copyCodeButton.addEventListener('click', async () => {
-  const code = codeValue.textContent.trim();
-  if (!code) return;
+async function copyCode() {
+  const code = codeValue?.textContent.trim() || '';
+  if (!code || code.includes('----')) return;
   try {
     await navigator.clipboard.writeText(code);
-    copyCodeButton.textContent = 'Copied';
-    window.setTimeout(() => { copyCodeButton.textContent = 'Copy code'; }, 1500);
+    if (copyCodeButton) {
+      copyCodeButton.textContent = 'Copied';
+      window.setTimeout(() => { copyCodeButton.textContent = 'Copy code'; }, 1500);
+    }
   } catch {
     setStatus('Select and copy the pairing code manually.', 'error');
   }
+}
+
+window.handlePairing = handlePairing;
+window.copyCode = copyCode;
+syncPublicMode();
+window.addEventListener('storage', () => {
+  isPremium = window.localStorage?.getItem('skylar_mode') === 'premium';
+  syncPublicMode();
 });
 
-phoneInput.addEventListener('input', () => {
-  phoneInput.value = phoneInput.value.replace(/[^0-9\s]/g, '');
-});
+if (form) {
+  form.removeAttribute('onsubmit');
+  form.addEventListener('submit', handlePairing);
+}
 
-// Admin & Licensing Mode Management
+if (phoneInput) {
+  phoneInput.addEventListener('input', () => {
+    phoneInput.value = phoneInput.value.replace(/[^0-9\s]/g, '');
+  });
+}
+
+if (copyCodeButton) copyCodeButton.addEventListener('click', copyCode);
+
+// Optional licensing controls are present only on newer admin-enabled pages.
 const modeBadge = document.querySelector('#mode-badge');
 const modeFreeBtn = document.querySelector('#mode-free-btn');
 const modePremiumBtn = document.querySelector('#mode-premium-btn');
@@ -182,49 +205,26 @@ const keyOutputBox = document.querySelector('#key-output-box');
 const generatedKeyText = document.querySelector('#generated-key-text');
 const copyKeyBtn = document.querySelector('#copy-key-btn');
 
-let isPremiumMode = false;
-
 function updateLicensingMode(premium) {
-  isPremiumMode = premium;
-  if (isPremiumMode) {
-    modeBadge.textContent = 'PREMIUM MODE';
-    modeBadge.style.color = '#ffcca7';
-    modePremiumBtn.classList.add('active');
-    modeFreeBtn.classList.remove('active');
-    adminActionTitle.textContent = 'Admin-Only Key Generation';
-    adminActionDesc.textContent = 'In Premium Mode, users must enter a valid activation key. Only authorized administrators can generate new keys here.';
-    generateKeyBtn.textContent = 'Generate Premium Key ↗';
-  } else {
-    modeBadge.textContent = 'FREE MODE';
-    modeBadge.style.color = '';
-    modeFreeBtn.classList.add('active');
-    modePremiumBtn.classList.remove('active');
-    adminActionTitle.textContent = 'Key Generation & Status';
-    adminActionDesc.textContent = 'In Free Mode, anyone can generate a session activation token or pair directly.';
-    generateKeyBtn.textContent = 'Generate Activation Key ↗';
-  }
-  keyOutputBox.hidden = true;
+  if (modeBadge) modeBadge.textContent = premium ? 'PREMIUM MODE' : 'FREE MODE';
+  modePremiumBtn?.classList.toggle('active', premium);
+  modeFreeBtn?.classList.toggle('active', !premium);
+  if (adminActionTitle) adminActionTitle.textContent = premium ? 'Admin-Only Key Generation' : 'Key Generation & Status';
+  if (adminActionDesc) adminActionDesc.textContent = premium
+    ? 'In Premium Mode, users must enter a valid activation key. Only authorized administrators can generate new keys here.'
+    : 'In Free Mode, anyone can generate an activation token or pair directly.';
+  if (generateKeyBtn) generateKeyBtn.textContent = premium ? 'Generate Premium Key ↗' : 'Generate Activation Key ↗';
+  conceal(keyOutputBox);
 }
 
 modeFreeBtn?.addEventListener('click', () => updateLicensingMode(false));
 modePremiumBtn?.addEventListener('click', () => updateLicensingMode(true));
-
 generateKeyBtn?.addEventListener('click', () => {
-  const prefix = isPremiumMode ? 'SKXD-PREM-2026' : 'SKXD-FREE-2026';
-  const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
-  const key = `${prefix}-${randomSuffix}`;
-  generatedKeyText.textContent = key;
-  keyOutputBox.hidden = false;
+  const prefix = modePremiumBtn?.classList.contains('active') ? 'SKXD-PREM-2026' : 'SKXD-FREE-2026';
+  if (generatedKeyText) generatedKeyText.textContent = `${prefix}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+  reveal(keyOutputBox);
 });
-
 copyKeyBtn?.addEventListener('click', async () => {
-  const key = generatedKeyText.textContent.trim();
-  if (!key) return;
-  try {
-    await navigator.clipboard.writeText(key);
-    copyKeyBtn.textContent = 'Copied';
-    window.setTimeout(() => { copyKeyBtn.textContent = 'Copy Key'; }, 1500);
-  } catch {
-    // fallback
-  }
+  if (!generatedKeyText) return;
+  try { await navigator.clipboard.writeText(generatedKeyText.textContent.trim()); } catch {}
 });
