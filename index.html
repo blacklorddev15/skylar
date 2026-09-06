@@ -34,12 +34,23 @@
       <section class="pair-section">
         <form id="pairForm">
           <div class="form-group">
+            <label for="countryTrigger">COUNTRY</label>
+            <button type="button" class="country-trigger" id="countryTrigger" onclick="openCountryModal()">
+              <span id="countryDisplay"><span class="sel-name">— Select country —</span></span>
+              <span class="caret">▾</span>
+            </button>
+          </div>
+
+          <div class="form-group">
             <label for="phoneNumber">WHATSAPP NUMBER</label>
-            <div class="phone-input-wrap">
-              <span class="country-prefix">+</span>
-              <input type="tel" id="phoneNumber" placeholder="Enter WhatsApp number" value="254712345678" required autocomplete="tel">
+            <div class="phone-row">
+              <div class="prefix-wrap">
+                <div class="prefix-box" id="prefixDisplay">+</div>
+                <input class="prefix-input" type="text" id="prefixInput" value="" placeholder="+" oninput="onPrefixInput(this.value)" maxlength="6" inputmode="numeric" autocomplete="off">
+              </div>
+              <input type="tel" id="phoneNumber" placeholder="700 000 000" required autocomplete="tel">
             </div>
-            <p class="field-tip">Enter the paired WhatsApp number with country code. Do not include spaces or the plus sign.</p>
+            <p class="field-tip">Select your country, then enter the local number without a leading 0.</p>
           </div>
 
           <button type="submit" class="submit-btn" id="submitBtn">
@@ -72,6 +83,19 @@
       <a href="./admin.html">Admin Dashboard</a>
     </footer>
   </div>
+
+  <!-- Country picker modal -->
+  <div class="country-modal-overlay" id="countryModal" onclick="if(event.target===this) closeCountryModal()">
+    <div class="country-modal">
+      <div class="country-modal-head">
+        <strong>Select country</strong>
+        <button type="button" class="country-modal-close" onclick="closeCountryModal()" aria-label="Close">✕</button>
+      </div>
+      <input type="text" class="country-search-input" id="countrySearch" placeholder="Search country…" oninput="filterCountries(this.value)" autocomplete="off" spellcheck="false">
+      <div class="country-list" id="countryList"></div>
+    </div>
+  </div>
+
   <script src="./script.js"></script>
 </body>
 </html>
