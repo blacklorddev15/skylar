@@ -36,7 +36,7 @@
           <div class="form-group">
             <label for="countryTrigger">COUNTRY</label>
             <button type="button" class="country-trigger" id="countryTrigger" onclick="openCountryModal()">
-              <span id="countryDisplay"><span class="sel-name">— Select country —</span></span>
+              <span id="countryDisplay"><span class="sel-flag">🌐</span><span class="sel-name is-placeholder">Select country</span></span>
               <span class="caret">▾</span>
             </button>
           </div>
@@ -85,7 +85,7 @@
   </div>
 
   <!-- Country picker modal -->
-  <div class="country-modal-overlay" id="countryModal" onclick="if(event.target===this) closeCountryModal()">
+  <div class="country-modal-overlay hidden" id="countryModal" hidden onclick="if(event.target===this) closeCountryModal()">
     <div class="country-modal">
       <div class="country-modal-head">
         <strong>Select country</strong>

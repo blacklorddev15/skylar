@@ -214,6 +214,222 @@ input[type="tel"], input[type="text"], input[type="password"] {
   line-height: 1.4;
 }
 
+/* ── country picker ─────────────────────────────────────────── */
+
+.country-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms var(--ease);
+}
+
+.country-trigger:hover,
+.country-trigger:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+}
+
+.country-trigger .sel-flag { font-size: 1.05rem; margin-right: 8px; }
+.country-trigger .sel-name { color: var(--text); }
+.country-trigger .sel-name.is-placeholder { color: var(--text-soft); font-weight: 500; }
+.country-trigger .caret { color: var(--accent); font-size: 0.7rem; flex-shrink: 0; }
+
+.phone-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.prefix-wrap {
+  position: relative;
+  flex: 0 0 92px;
+  width: 92px;
+}
+
+.prefix-box {
+  height: 100%;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(251, 191, 36, 0.06);
+  color: var(--accent);
+  font-family: monospace;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Transparent overlay so the dial code can also be typed by hand; the visible
+   value is mirrored in .prefix-box above it. */
+.phone-row .prefix-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--accent);
+  font-family: monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  cursor: pointer;
+}
+
+/* The shared input rule above is bare (it expects a bordered wrapper), so the
+   number field is given its own box here. */
+.phone-row > input[type="tel"] {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card-bg);
+  transition: border-color 160ms var(--ease);
+}
+
+.phone-row > input[type="tel"]:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+}
+
+.country-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(3, 3, 5, 0.82);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+}
+
+.country-modal {
+  width: min(440px, 100%);
+  margin: 8vh auto 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.country-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.country-modal-head strong {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.country-modal-close {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.country-modal-close:hover { color: var(--accent); }
+
+.country-modal .country-search-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.country-modal .country-search-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.18);
+}
+
+.country-list {
+  margin-top: 12px;
+  max-height: min(52vh, 340px);
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card-bg);
+}
+
+.country-list::-webkit-scrollbar { width: 5px; }
+
+.country-list::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.35);
+  border-radius: 99px;
+}
+
+.country-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border: none;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.12);
+  background: transparent;
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms var(--ease);
+}
+
+.country-option:last-child { border-bottom: none; }
+
+.country-option:hover,
+.country-option:focus-visible {
+  outline: none;
+  background: rgba(251, 191, 36, 0.12);
+}
+
+.country-option .flag { font-size: 1.05rem; }
+.country-option .cname { flex: 1; }
+.country-option .ccode { font-family: monospace; font-size: 0.8rem; color: var(--accent); }
+
+.country-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+}
+
 .submit-btn {
   width: 100%;
   padding: 16px;

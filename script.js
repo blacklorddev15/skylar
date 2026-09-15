@@ -13,6 +13,13 @@ const readyFooter = document.querySelector('#readyFooterText');
 const activationKeyInput = document.querySelector('#activation-key');
 const activationKeyGroup = document.querySelector('#activation-key-group');
 
+const countryModal = document.querySelector('#countryModal');
+const countryDisplay = document.querySelector('#countryDisplay');
+const countrySearch = document.querySelector('#countrySearch');
+const countryList = document.querySelector('#countryList');
+const prefixInput = document.querySelector('#prefixInput');
+const prefixDisplay = document.querySelector('#prefixDisplay');
+
 let pollTimer = 0;
 let isPremium = window.localStorage?.getItem('skylar_mode') === 'premium';
 
@@ -48,6 +55,151 @@ function setBusy(busy) {
 function normalizePhone(value) {
   return String(value || '').replace(/[^0-9]/g, '');
 }
+
+/* ── country picker ──────────────────────────────────────────────
+   The dial code is chosen from countries.json rather than typed, so the number
+   sent to the gateway is always a full international one. The prefix box stays
+   editable for codes people know by heart: typing one that matches the list
+   selects that country and fills its name into the trigger.
+
+   The list is fetched once and shared. countries.json writes the NANP
+   territories as "+1-268", "+1-876" and so on, so codes are normalised to
+   digits — otherwise Jamaica, Barbados and nine others become unselectable. */
+let countries = [];
+let visibleCountries = [];
+let selectedCountry = null;
+let countriesPromise = null;
+
+function loadCountries() {
+  if (countriesPromise) return countriesPromise;
+
+  countriesPromise = fetch('./countries.json')
+    .then((response) => (response.ok ? response.json() : []))
+    .then((list) => {
+      countries = Array.isArray(list)
+        ? list
+            .map((entry) => {
+              const digits = String(entry && entry.code ? entry.code : '').replace(/[^0-9]/g, '');
+              if (!entry || typeof entry.name !== 'string' || !digits) return null;
+              return { name: entry.name, flag: entry.flag || '', code: `+${digits}` };
+            })
+            .filter(Boolean)
+        : [];
+    })
+    .catch(() => { countries = []; })
+    .then(() => {
+      renderCountryList(countries);
+      return countries;
+    });
+
+  return countriesPromise;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function renderCountryList(list) {
+  if (!countryList) return;
+  visibleCountries = list;
+  if (!list.length) {
+    countryList.innerHTML = '<div class="country-empty">No countries available.</div>';
+    return;
+  }
+  // Options carry the index into visibleCountries rather than the record itself, so
+  // a country name containing an apostrophe cannot break the markup.
+  countryList.innerHTML = list
+    .map((country, index) => `<button type="button" class="country-option" data-index="${index}">`
+      + `<span class="flag">${escapeHtml(country.flag)}</span>`
+      + `<span class="cname">${escapeHtml(country.name)}</span>`
+      + `<span class="ccode">${escapeHtml(country.code)}</span>`
+      + '</button>')
+    .join('');
+}
+
+function filterCountries(query) {
+  const needle = String(query || '').trim().toLowerCase();
+  if (!needle) {
+    renderCountryList(countries);
+    return;
+  }
+  const digits = needle.replace(/[^0-9]/g, '');
+  renderCountryList(countries.filter((country) => {
+    if (country.name.toLowerCase().includes(needle)) return true;
+    if (digits && country.code.replace(/[^0-9]/g, '').includes(digits)) return true;
+    return false;
+  }));
+}
+
+function selectCountry(country) {
+  if (!country) return;
+  selectedCountry = country;
+  if (prefixInput) prefixInput.value = country.code;
+  if (prefixDisplay) prefixDisplay.textContent = country.code;
+  if (countryDisplay) {
+    countryDisplay.innerHTML = `<span class="sel-flag">${escapeHtml(country.flag)}</span>`
+      + `<span class="sel-name">${escapeHtml(`${country.name} (${country.code})`)}</span>`;
+  }
+  closeCountryModal();
+  phoneInput?.focus();
+}
+
+function openCountryModal() {
+  if (!countryModal) return;
+  reveal(countryModal);
+  if (countrySearch) countrySearch.value = '';
+  filterCountries('');
+  loadCountries();
+  window.setTimeout(() => countrySearch?.focus(), 60);
+}
+
+function closeCountryModal() {
+  conceal(countryModal);
+}
+
+function onPrefixInput(value) {
+  let digits = String(value || '').replace(/[^0-9+]/g, '');
+  if (digits && !digits.startsWith('+')) digits = `+${digits}`;
+  if (digits.length > 6) digits = digits.slice(0, 6);
+  if (prefixInput) prefixInput.value = digits;
+  if (prefixDisplay) prefixDisplay.textContent = digits || '+';
+  if (digits.length >= 2) {
+    const match = countries.find((country) => country.code === digits);
+    if (match) selectedCountry = match;
+  } else {
+    selectedCountry = null;
+  }
+}
+
+// Dial code + local number, with any leading 0 dropped from the local part.
+function composePhone() {
+  const prefix = normalizePhone(prefixInput?.value);
+  const local = normalizePhone(phoneInput?.value).replace(/^0+/, '');
+  return prefix + local;
+}
+
+countryList?.addEventListener('click', (event) => {
+  const option = event.target.closest('.country-option');
+  if (!option) return;
+  selectCountry(visibleCountries[Number(option.dataset.index)]);
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && countryModal && !countryModal.hidden) closeCountryModal();
+});
+
+// index.html calls these from inline onclick / oninput handlers.
+window.openCountryModal = openCountryModal;
+window.closeCountryModal = closeCountryModal;
+window.filterCountries = filterCountries;
+window.onPrefixInput = onPrefixInput;
+
+loadCountries();
 
 function showFallback() {
   if (!fallbackBox) return;
@@ -120,7 +272,13 @@ async function handlePairing(event) {
   conceal(codeBox);
   conceal(fallbackBox);
 
-  const phone = normalizePhone(phoneInput?.value);
+  const prefix = normalizePhone(prefixInput?.value);
+  if (!prefix) {
+    setStatus('Select your country first — that is what sets the dial code.', 'error');
+    return false;
+  }
+
+  const phone = composePhone();
   if (phone.length < 8 || phone.length > 15) {
     setStatus('Enter a valid international number using 8–15 digits.', 'error');
     return false;
